@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:myapp/services/auth_service.dart';
+import 'package:myapp/perfil.dart';
 
 class RegistroPage extends StatefulWidget {
   const RegistroPage({super.key});
@@ -14,6 +17,7 @@ class _RegistroPageState extends State<RegistroPage> {
   final _cedulaController = TextEditingController();
   final _correoController = TextEditingController();
   final _contrasenaController = TextEditingController();
+  final AuthService _authService = AuthService();
 
   @override
   void dispose() {
@@ -37,7 +41,7 @@ class _RegistroPageState extends State<RegistroPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
+                children: [ 
                   const SizedBox(height: 50),
                   const CircleAvatar(
                     radius: 50,
@@ -78,6 +82,29 @@ class _RegistroPageState extends State<RegistroPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      UserCredential? userCredential = await _authService.signInWithGoogle();
+                      if (userCredential != null) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const PerfilScreen()),
+                        );
+                      }
+                    },
+                    icon: Image.asset('assets/images/google_logo.png', height: 24.0), // Asegúrate de tener este logo en tus assets
+                    label: const Text('Registrarse con Google'),
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.black,
+                      backgroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                        side: const BorderSide(color: Colors.grey),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -94,20 +121,9 @@ class _RegistroPageState extends State<RegistroPage> {
                     ],
                   ),
                   const SizedBox(height: 50),
-                   Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.home_work_outlined, color: Color(0xFF2cb7a6)),
-                      SizedBox(width: 8),
-                      Text(
-                        'TURQUESA HOSTAL',
-                        style: TextStyle(
-                          color:  Color(0xFF2cb7a6),
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+                  Image.asset(
+                    'assets/images/logo.png',
+                    height: 100,
                   ),
                 ],
               ),
