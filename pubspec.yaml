@@ -50,11 +50,6 @@ dependencies:
   google_fonts: ^6.3.2
 
 
-  flutter_localizations: # <--- Debe estar al mismo nivel que los demás
-    sdk: flutter 
-  
-
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
