@@ -1,6 +1,7 @@
 // Importa la biblioteca principal de Material Design de Flutter.
 import 'package:flutter/material.dart';
 import './home_screen.dart';
+import './pantalla_registro.dart';
 
 // Define la clase LoginPage, que es un widget sin estado (StatelessWidget).
 // Esto significa que su apariencia y comportamiento no cambian con el tiempo o la interacción del usuario.
@@ -245,7 +246,14 @@ class LoginPage extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PantallaRegistro(),
+                          ),
+                        );
+                      },
                       child: const Text('CREAR CUENTA'),
                     ),
                   ],
