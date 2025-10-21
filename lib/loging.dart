@@ -1,6 +1,6 @@
 // Importa la biblioteca principal de Material Design de Flutter.
 import 'package:flutter/material.dart';
-import './perfil.dart';
+import './home_screen.dart';
 
 // Define la clase LoginPage, que es un widget sin estado (StatelessWidget).
 // Esto significa que su apariencia y comportamiento no cambian con el tiempo o la interacción del usuario.
@@ -176,7 +176,7 @@ class LoginPage extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => PerfilScreen()),
+                      MaterialPageRoute(builder: (context) => HomeScreen()),
                     );
                   }, // La función que se ejecuta al presionar el botón (actualmente vacía).
                   child: const Text('INGRESAR'),
