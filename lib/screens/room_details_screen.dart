@@ -15,7 +15,9 @@ class RoomDetailsScreen extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
         title: const Text('Habitación doble'),
         actions: [IconButton(icon: const Icon(Icons.edit), onPressed: () {})],
@@ -97,7 +99,10 @@ class RoomDetailsScreen extends StatelessWidget {
                       ],
                     ),
                     IconButton(
-                      icon: const Icon(Icons.add_circle_outline, color: const Color(0xFF2CB7A6)),
+                      icon: const Icon(
+                        Icons.add_circle_outline,
+                        color: const Color(0xFF2CB7A6),
+                      ),
                       onPressed: () => _showStatusMenu(context),
                     ),
                   ],
@@ -110,9 +115,8 @@ class RoomDetailsScreen extends StatelessWidget {
                   child: Text(
                     'ELIMINAR RESERVA',
                     style: GoogleFonts.roboto(
-                      color: const Color(0xFF2CB7A6) ,
+                      color: const Color(0xFF2CB7A6),
                       fontWeight: FontWeight.bold,
-
                     ),
                   ),
                 ),
@@ -124,19 +128,24 @@ class RoomDetailsScreen extends StatelessWidget {
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF2CB7A6),
         items: const [
-          BottomNavigationBarItem(icon: Icon(
-            Icons.chat_bubble_outline, 
-            color: Color.fromARGB(255, 255, 255, 255)), 
-          label:'',
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.chat_bubble_outline,
+              color: Color.fromARGB(255, 255, 255, 255),
+            ),
+            label: '',
           ),
-          BottomNavigationBarItem(icon: Icon(
-            Icons.home,
-            color: Color.fromARGB(255, 255, 255, 255)),
-          label: ''),
-          BottomNavigationBarItem(icon: Icon(
-            Icons.person_outline,
-            color: Color.fromARGB(255, 255, 255, 255)),
-          label: ''),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home, color: Color.fromARGB(255, 255, 255, 255)),
+            label: '',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(
+              Icons.person_outline,
+              color: Color.fromARGB(255, 255, 255, 255),
+            ),
+            label: '',
+          ),
         ],
         selectedItemColor: Theme.of(context).primaryColor,
         unselectedItemColor: Colors.grey,
@@ -176,8 +185,10 @@ class RoomDetailsScreen extends StatelessWidget {
           children: [
             ListTile(
               leading: const Icon(Icons.check_circle_outline),
-              title: const Text('DISPONIBLE',
-                  style: TextStyle(color: Color(0xFF2CB7A6))),
+              title: const Text(
+                'DISPONIBLE',
+                style: TextStyle(color: Color(0xFF2CB7A6)),
+              ),
               onTap: () {
                 Provider.of<RoomProvider>(
                   context,
@@ -188,8 +199,10 @@ class RoomDetailsScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.cleaning_services),
-              title: const Text('EN LIMPIEZA',
-                  style: TextStyle(color: Color(0xFF2CB7A6))),
+              title: const Text(
+                'EN LIMPIEZA',
+                style: TextStyle(color: Color(0xFF2CB7A6)),
+              ),
               onTap: () {
                 Provider.of<RoomProvider>(
                   context,
@@ -200,8 +213,10 @@ class RoomDetailsScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.build),
-              title: const Text('MANTENIMIENTO',
-                  style: TextStyle(color: Color(0xFF2CB7A6))),
+              title: const Text(
+                'MANTENIMIENTO',
+                style: TextStyle(color: Color(0xFF2CB7A6)),
+              ),
               onTap: () {
                 Provider.of<RoomProvider>(
                   context,
@@ -212,8 +227,10 @@ class RoomDetailsScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.bed),
-              title: const Text('OCUPADA',
-                  style: TextStyle(color: Color(0xFF2CB7A6))),
+              title: const Text(
+                'OCUPADA',
+                style: TextStyle(color: Color(0xFF2CB7A6)),
+              ),
               onTap: () {
                 Provider.of<RoomProvider>(
                   context,

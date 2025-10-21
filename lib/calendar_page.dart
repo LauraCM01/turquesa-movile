@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
+import './screens/room_details_screen.dart';
+import './reservation_form.dart';
 
 // ----------------------------------------------------
 // 1. CONSTANTES Y MODELO DE DATOS
@@ -39,6 +41,7 @@ class _CalendarPageState extends State<CalendarPage> {
   DateTime _focusedDay = DateTime.utc(2025, 9, 1);
   DateTime? _selectedDay;
   CalendarFormat _calendarFormat = CalendarFormat.month;
+  PageController? _pageController;
 
   // Variables de Rango (NECESARIAS si usaste el código de rangos, aunque no las uses)
   DateTime? _rangeStart;
@@ -56,7 +59,38 @@ class _CalendarPageState extends State<CalendarPage> {
         _rangeStart = null;
         _rangeEnd = null;
       });
-      print('Día seleccionado: $selectedDay');
+      //print('Día seleccionado: $selectedDay');
+
+      final normalizedDay = DateTime.utc(selectedDay.year, selectedDay.month, selectedDay.day);
+      final String status = hostelAvailability[normalizedDay] ?? 'Disponible';
+
+      if (status == 'Reservado') {
+        // Lógica de navegación:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            // Debes crear una nueva pantalla, por ejemplo 'ReservationDetailsScreen'
+            builder: (context) => RoomDetailsScreen(
+              // Le pasas la fecha para que sepa qué reserva mostrar
+              //date: selectedDay,
+            ),
+          ),
+        );
+      } else {
+        // El status es 'Disponible'
+
+        // Lógica de navegación:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            // Debes crear otra pantalla, por ejemplo 'NewReservationFormScreen'
+            builder: (context) => ReservationForm(
+              // Le pasas la fecha para que el formulario ya sepa qué día se va a reservar
+              //date: selectedDay,
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -201,7 +235,12 @@ class _CalendarPageState extends State<CalendarPage> {
                           size: 16,
                           color: Colors.black54,
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          _pageController?.previousPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.ease,
+                          );
+                        },
                       ),
                       IconButton(
                         icon: const Icon(
@@ -209,7 +248,12 @@ class _CalendarPageState extends State<CalendarPage> {
                           size: 16,
                           color: Colors.black54,
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          _pageController?.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.ease,
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -219,6 +263,9 @@ class _CalendarPageState extends State<CalendarPage> {
 
             // El Widget principal del Calendario
             TableCalendar(
+              onCalendarCreated: (PageController controller) {
+                _pageController = controller;
+              },
               locale: 'es',
               firstDay: DateTime.utc(2020, 1, 1),
               lastDay: DateTime.utc(2030, 12, 31),
@@ -279,7 +326,10 @@ class _CalendarPageState extends State<CalendarPage> {
                   const SizedBox(width: 25),
                   _buildLegendItem(kAvailableColor, 'Disponible'),
                   const SizedBox(width: 25),
-                  _buildLegendItem(const Color.fromARGB(255, 99, 99, 97), 'Fuera de servicio'),
+                  _buildLegendItem(
+                    const Color.fromARGB(255, 99, 99, 97),
+                    'Fuera de servicio',
+                  ),
                 ],
               ),
             ),
