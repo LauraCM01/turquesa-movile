@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import './calendar_page.dart';
 
 const Color kPrimaryColor = Color(0xFF4DB6AC); // Un turquesa bonito
 
@@ -55,12 +56,17 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       // 1. Barra superior (AppBar)
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         elevation: 0,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.house_siding_rounded, color: kPrimaryColor, size: 28),
+            const Icon(
+              Icons.house_siding_rounded,
+              color: kPrimaryColor,
+              size: 28,
+            ),
             const SizedBox(width: 8),
             Text(
               'TURQUESA HOSTAL',
@@ -180,9 +186,7 @@ class _RoomCard extends StatelessWidget {
       aspectRatio: 1.0, // ¡Esto asegura que la tarjeta SIEMPRE sea cuadrada!
       child: Card(
         clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         elevation: 8,
         child: Column(
           children: [
@@ -221,13 +225,24 @@ class _RoomCard extends StatelessWidget {
                     ),
                     // Botón '+'
                     IconButton(
-                      icon: const Icon(Icons.add_circle, color: kPrimaryColor, size: 28),
+                      icon: const Icon(
+                        Icons.add_circle,
+                        color: kPrimaryColor,
+                        size: 28,
+                      ),
                       onPressed: () {
                         // Acción al presionar el '+'
-                        debugPrint('Agregado: ${room.name}');
+                        //debugPrint('Agregado: ${room.name}');
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => CalendarPage(),
+                          ),
+                        );
                       },
-                      padding: EdgeInsets.zero, // Elimina el padding extra para que el ícono sea más grande
-                      constraints: const BoxConstraints(), // Elimina restricciones de tamaño
+                      padding: EdgeInsets
+                          .zero, // Elimina el padding extra para que el ícono sea más grande
+                      constraints:
+                          const BoxConstraints(), // Elimina restricciones de tamaño
                     ),
                   ],
                 ),

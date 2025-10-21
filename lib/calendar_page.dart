@@ -243,7 +243,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 outsideDaysVisible: true,
                 selectedDecoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.transparent,
+                  color: const Color.fromRGBO(26, 188, 156, 1),
                 ),
               ),
 
@@ -278,6 +278,8 @@ class _CalendarPageState extends State<CalendarPage> {
                   _buildLegendItem(kReservedColor, 'Reservado'),
                   const SizedBox(width: 25),
                   _buildLegendItem(kAvailableColor, 'Disponible'),
+                  const SizedBox(width: 25),
+                  _buildLegendItem(const Color.fromARGB(255, 99, 99, 97), 'Fuera de servicio'),
                 ],
               ),
             ),
@@ -286,7 +288,7 @@ class _CalendarPageState extends State<CalendarPage> {
       ),
       // Navegación inferior (simulación)
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: kPrimaryColor,
+        backgroundColor: const Color.fromRGBO(26, 188, 156, 1),
         selectedItemColor: Colors.white,
         unselectedItemColor: Colors.white.withOpacity(0.6),
         items: const [
