@@ -151,7 +151,7 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
               ),
             ),
           ),
-        ),
+        )
       ),
     );
   }
