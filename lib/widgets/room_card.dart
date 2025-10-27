@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/calendar_page.dart' hide kPrimaryColor;
+import 'package:myapp/Pantalla-Calendario.dart' hide kPrimaryColor;
 import 'package:myapp/models/room.dart';
 
 class RoomCard extends StatelessWidget {

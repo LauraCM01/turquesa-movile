@@ -1,8 +1,8 @@
 // Importa la biblioteca principal de Material Design de Flutter.
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import './home_screen.dart';
-import './pantalla_registro.dart';
+import 'Pantalla-Inicio.dart';
+import 'Pantalla-Registro.dart';
 
 // Define la clase LoginPage, que es un widget con estado (StatefulWidget).
 class LoginPage extends StatefulWidget {

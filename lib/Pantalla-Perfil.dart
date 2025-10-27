@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:myapp/widgets/barranavegacion.dart';
+import 'package:myapp/widgets/Barra-Navegacion.dart';
 
 class PerfilScreen extends StatelessWidget {
   const PerfilScreen({super.key});

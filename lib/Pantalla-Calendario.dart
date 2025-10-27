@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/widgets/barranavegacion.dart';
+import 'package:myapp/widgets/Barra-Navegacion.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
-import 'room_details_screen.dart';
-import './reservation_form.dart';
+import 'Pantalla-Estados.dart';
+import 'Formulario-Reservas.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 // ----------------------------------------------------

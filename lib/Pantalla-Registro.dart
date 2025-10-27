@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import './home_screen.dart';
+import 'Pantalla-Inicio.dart';
 
 class PantallaRegistro extends StatefulWidget {
   const PantallaRegistro({super.key});

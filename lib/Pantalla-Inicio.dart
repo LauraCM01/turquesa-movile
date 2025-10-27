@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:myapp/models/room.dart';
-import 'widgets/barranavegacion.dart';
+import 'widgets/Barra-Navegacion.dart';
 import 'widgets/room_card.dart';
 
 class HomeScreen extends StatefulWidget {

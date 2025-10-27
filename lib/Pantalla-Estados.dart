@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:myapp/models/room_status.dart';
 import 'package:myapp/providers/room_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:myapp/widgets/barranavegacion.dart';
+import 'package:myapp/widgets/Barra-Navegacion.dart';
 
 class RoomDetailsScreen extends StatefulWidget {
   const RoomDetailsScreen({super.key});
