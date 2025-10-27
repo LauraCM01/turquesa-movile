@@ -1,26 +1,33 @@
 
 import 'package:flutter/material.dart';
+import 'package:myapp/widgets/barranavegacion.dart';
 
 class PerfilScreen extends StatelessWidget {
   const PerfilScreen({super.key});
 
+   
+
   @override
   Widget build(BuildContext context) {
+   int _selectedIndex = 2;
+   void _onItemTapped(int index) {
+      _selectedIndex = index;
+  }
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF009688)),
+          icon: const Icon(Icons.arrow_back, color: Color(0XFF2CB7A6)),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
           'Perfil',
-          style: TextStyle(color: Color(0xFF009688), fontWeight: FontWeight.bold),
+          style: TextStyle(color: Color(0XFF2CB7A6), fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.exit_to_app, color: Color(0xFF009688)),
+            icon: const Icon(Icons.exit_to_app, color: Color(0XFF2CB7A6)),
             onPressed: () {
               // TODO: Implementar cierre de sesión
             },
@@ -34,7 +41,7 @@ class PerfilScreen extends StatelessWidget {
             children: [
               const CircleAvatar(
                 radius: 50,
-                backgroundColor: Color(0xFF009688),
+                backgroundColor: Color(0XFF2CB7A6),
                 child: Icon(
                   Icons.person,
                   size: 60,
@@ -55,7 +62,7 @@ class PerfilScreen extends StatelessWidget {
                   // TODO: Implementar cierre de sesión
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF009688),
+                  backgroundColor: const Color(0XFF2CB7A6),
                   padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 15),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
@@ -70,26 +77,14 @@ class PerfilScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFF009688),
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white.withOpacity(0.7),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: '',
-          ),
-        ],
+      
+bottomNavigationBar: BarraNavegacion(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
       ),
     );
+
+    
   }
 
   Widget _buildTextField({required String label, required String value}) {
@@ -98,7 +93,7 @@ class PerfilScreen extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(color: Colors.black54),
+          style: const TextStyle(color: Colors.grey),
         ),
         const SizedBox(height: 5),
         TextFormField(
@@ -122,7 +117,7 @@ class PerfilScreen extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(color: Colors.black54),
+          style: const TextStyle(color: Colors.grey),
         ),
         const SizedBox(height: 5),
         TextFormField(

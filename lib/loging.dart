@@ -3,81 +3,120 @@ import 'package:flutter/material.dart';
 import './home_screen.dart';
 import './pantalla_registro.dart';
 
-// Define la clase LoginPage, que es un widget sin estado (StatelessWidget).
-// Esto significa que su apariencia y comportamiento no cambian con el tiempo o la interacción del usuario.
-class LoginPage extends StatelessWidget {
+// Define la clase LoginPage, que es un widget con estado (StatefulWidget).
+class LoginPage extends StatefulWidget {
   // El constructor constante mejora el rendimiento.
   const LoginPage({super.key});
 
   @override
+  // El método createState es obligatorio en un StatefulWidget y devuelve una instancia de su clase de estado asociada.
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+// La clase _LoginPageState contiene el estado y la lógica de la interfaz de usuario para LoginPage.
+// El guion bajo (_) al principio del nombre la hace privada para este archivo.
+class _LoginPageState extends State<LoginPage> {
+  // Aquí puedes declarar variables que mantendrán el estado del widget,
+  // como los controladores para los campos de texto o el estado de un checkbox.
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _rememberMe = true;
+
+  @override
   // El método build es el corazón de cualquier widget.
   // Dibuja la interfaz de usuario en la pantalla y se llama cada vez que Flutter necesita renderizar el widget.
+  // En un StatefulWidget, se llama cuando se invoca a setState().
   Widget build(BuildContext context) {
     // Scaffold es como un andamio para construir una pantalla de Material Design.
-    // Proporciona una estructura básica con appBar, body, floatingActionButton, etc.
     return Scaffold(
       // Define el color de fondo de toda la pantalla.
       backgroundColor: Colors.white,
       // SafeArea es un widget crucial que ajusta su contenido para evitar que se superponga
-      // con elementos del sistema operativo, como la barra de estado superior o el "notch" en algunos teléfonos.
+      // con elementos del sistema operativo.
       body: SafeArea(
-        // SingleChildScrollView permite que su contenido sea desplazable verticalmente
-        // si el espacio de la pantalla no es suficiente. Esto evita errores de desbordamiento (overflow).
+        // SingleChildScrollView permite que su contenido sea desplazable.
         child: SingleChildScrollView(
           // Padding añade un espacio vacío alrededor de su widget hijo.
           child: Padding(
-            // EdgeInsets.symmetric crea un padding igual en los lados horizontales.
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            // Column organiza a sus hijos en una lista vertical. Es uno de los widgets de layout más comunes.
+            // Column organiza a sus hijos en una lista vertical.
             child: Column(
-              // mainAxisAlignment alinea a los hijos a lo largo del eje principal (vertical para Column).
-              // .center los coloca en el medio.
               mainAxisAlignment: MainAxisAlignment.center,
-              // crossAxisAlignment alinea a los hijos a lo largo del eje transversal (horizontal para Column).
-              // .stretch hace que los hijos ocupen todo el ancho disponible.
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              // 'children' es la lista de widgets que se mostrarán dentro de la columna.
               children: <Widget>[
-                // SizedBox es una caja con un tamaño específico. Se usa comúnmente para crear espacios vacíos.
                 const SizedBox(height: 60.0),
 
-                // Logo de la aplicación.
-                const CircleAvatar(
-                  radius: 70, // Define el radio del círculo.
-                  backgroundColor: Color(
-                    0XFF2CB7A6,
-                  ), // Color de fondo del círculo (teal).
-                  // El 'child' es el widget que va dentro del CircleAvatar.
-                  child: Icon(
-                    Icons.person,
-                    size: 80, // Tamaño del ícono.
-                    color: Colors.white, // Color del ícono.
+                // Logo de la marca.
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      // Define el ancho y alto deseado para tu logo.
+                      width: 200, // Ejemplo de ancho
+                      child: Image.network(
+                        // ¡TODO: Reemplaza esta URL de ejemplo con la URL real de tu logo!
+                        'https://res.cloudinary.com/dfznn7pui/image/upload/v1761514333/LOGO-HOSTAL_yvkmmi.png',
+                        fit: BoxFit
+                            .contain, // Ajusta cómo se muestra la imagen dentro del SizedBox
+                        loadingBuilder:
+                            (
+                              BuildContext context,
+                              Widget child,
+                              ImageChunkEvent? loadingProgress,
+                            ) {
+                              if (loadingProgress == null) return child;
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  value:
+                                      loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                      : null,
+                                ),
+                              );
+                            },
+                        errorBuilder:
+                            (
+                              BuildContext context,
+                              Object exception,
+                              StackTrace? stackTrace,
+                            ) {
+                              // Widget a mostrar si la imagen no se puede cargar (por ejemplo, un ícono o texto de error)
+                              return const Icon(Icons.error, color: Colors.red);
+                            },
+                      ),
+                    ),
+                  ],
+                ),
+
+                // Icono usuario.
+                Padding(
+                  // Aplica 20.0 de margen en la parte superior (top)
+                  // y 20.0 a la izquierda y derecha (left, right).
+                  // La parte inferior (bottom) se queda en 0.0.
+                  padding: const EdgeInsets.only(
+                    top: 40.0,
+                    bottom: 0.0, // O simplemente omites el 'bottom' ya que por defecto es 0.0
+                  ),
+                  child: const CircleAvatar(
+                    // Tamaño reducido
+                    radius: 50,
+                    backgroundColor: Color(0XFF2CB7A6),
+                    child: Icon(Icons.person, size: 50, color: Colors.white),
                   ),
                 ),
-                const SizedBox(height: 48.0), // Espacio vertical.
+                const SizedBox(height: 20.0),
+
                 // Campo de texto para el nombre de usuario (Username).
                 TextFormField(
-                  initialValue: 'Nombre de usuario',
-                  // 'style' controla la apariencia del texto que el usuario escribe.
-                  style: const TextStyle(
-                    fontSize:
-                        18.0, // <-- Cambia el tamaño del texto de entrada aquí.
-                    color: Colors
-                        .black, // Puedes añadir otros estilos, como el color.
-                  ),
-                  // 'decoration' personaliza la apariencia del campo de texto.
+                  controller: _usernameController, // Asocia el controlador.
+                  style: const TextStyle(fontSize: 18.0, color: Colors.grey),
                   decoration: InputDecoration(
-                    // 'hintStyle' controla la apariencia del texto de sugerencia.
-                    hintStyle: const TextStyle(
-                      fontSize:
-                          16.0, // <-- Cambia el tamaño del texto de sugerencia aquí.
-                    ),
                     prefixIcon: const Icon(
                       Icons.person_outline,
                       color: Colors.grey,
                     ),
-                    hintText:
-                        'Usuario', // Texto de sugerencia que aparece cuando el campo está vacío.
+                    hintText: 'Usuario',
                     contentPadding: const EdgeInsets.fromLTRB(
                       20.0,
                       15.0,
@@ -107,22 +146,10 @@ class LoginPage extends StatelessWidget {
 
                 // Campo de texto para la contraseña (Password).
                 TextFormField(
-                  initialValue: '*********',
-                  obscureText:
-                      true, // Oculta el texto ingresado, ideal para contraseñas.
-                  // 'style' controla la apariencia del texto que el usuario escribe.
-                  style: const TextStyle(
-                    fontSize:
-                        18.0, // <-- Cambia el tamaño del texto de entrada aquí.
-                    color: Colors
-                        .black, // Puedes añadir otros estilos, como el color.
-                  ),
+                  controller: _passwordController, // Asocia el controlador.
+                  obscureText: true, // Oculta el texto.
+                  style: const TextStyle(fontSize: 18.0, color: Colors.grey),
                   decoration: InputDecoration(
-                    // 'hintStyle' controla la apariencia del texto de sugerencia.
-                    hintStyle: const TextStyle(
-                      fontSize:
-                          16.0, // <-- Cambia el tamaño del texto de sugerencia aquí.
-                    ),
                     prefixIcon: const Icon(
                       Icons.lock_outline,
                       color: Colors.grey,
@@ -157,7 +184,6 @@ class LoginPage extends StatelessWidget {
 
                 // Botón de inicio de sesión (Login Button).
                 ElevatedButton(
-                  // 'style' personaliza la apariencia del botón.
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0XFF2CB7A6),
                     foregroundColor: Colors.white,
@@ -165,41 +191,47 @@ class LoginPage extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
-                    // --- AQUÍ SE CONTROLA EL ESTILO DEL TEXTO DEL BOTÓN ---
-                    // 'textStyle' define la apariencia del widget de texto hijo del botón.
                     textStyle: const TextStyle(
-                      fontSize:
-                          20, // <-- Puedes cambiar el tamaño de la fuente aquí.
-                      fontWeight: FontWeight
-                          .bold, // <-- Y también otras propiedades como el peso de la fuente.
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   onPressed: () {
+                    // Ahora puedes acceder al texto de los campos usando los controladores.
+                    // final username = _usernameController.text;
+                    // final password = _passwordController.text;
+                    // print('Usuario: $username, Contraseña: $password');
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => HomeScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => const HomeScreen(),
+                      ),
                     );
-                  }, // La función que se ejecuta al presionar el botón (actualmente vacía).
+                  },
                   child: const Text('INGRESAR'),
                 ),
                 const SizedBox(height: 16.0),
 
                 // Fila para las opciones de "Recordar" y "Recuperar contraseña".
-                // Row organiza a sus hijos en una lista horizontal.
                 Row(
-                  mainAxisAlignment: MainAxisAlignment
-                      .spaceBetween, // Distribuye el espacio entre los hijos.
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
                         Checkbox(
-                          value: true,
-                          onChanged: (value) {},
+                          value:
+                              _rememberMe, // El valor se basa en la variable de estado.
+                          onChanged: (value) {
+                            // setState() notifica a Flutter que el estado ha cambiado,
+                            // por lo que debe volver a dibujar el widget.
+                            setState(() {
+                              _rememberMe = value ?? false;
+                            });
+                          },
                           activeColor: const Color(0XFF2CB7A6),
                         ),
                         const Text(
                           'Recordar',
-                          // Para cambiar el tamaño, modifica el fontSize.
                           style: TextStyle(fontSize: 16.0),
                         ),
                       ],
@@ -207,9 +239,7 @@ class LoginPage extends StatelessWidget {
                     TextButton(
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.grey,
-                        textStyle: const TextStyle(
-                          fontSize: 16.0, // <-- Tamaño de la fuente.
-                        ),
+                        textStyle: const TextStyle(fontSize: 16.0),
                       ),
                       onPressed: () {},
                       child: const Text('Recuperar contraseña'),
@@ -223,12 +253,9 @@ class LoginPage extends StatelessWidget {
                   children: [
                     const Text(
                       '¿Todavía no tienes cuenta?',
-                      // Para cambiar el tamaño, modifica el fontSize.
                       style: TextStyle(fontSize: 16.0),
                     ),
-                    const SizedBox(
-                      height: 16.0,
-                    ), // Espacio entre el texto y el nuevo botón.
+                    const SizedBox(height: 16.0),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0XFF2CB7A6),
@@ -241,8 +268,7 @@ class LoginPage extends StatelessWidget {
                           borderRadius: BorderRadius.circular(30.0),
                         ),
                         textStyle: const TextStyle(
-                          fontSize:
-                              18, // Tamaño de fuente ligeramente más pequeño que el principal.
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -250,7 +276,7 @@ class LoginPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => PantallaRegistro(),
+                            builder: (context) => const PantallaRegistro(),
                           ),
                         );
                       },
@@ -260,7 +286,7 @@ class LoginPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 24.0),
 
-                // --- SECCIÓN DE LOGIN SOCIAL ---
+                // Sección de login social.
                 Row(
                   children: <Widget>[
                     Expanded(child: Divider(color: Colors.grey.shade400)),
@@ -278,7 +304,7 @@ class LoginPage extends StatelessWidget {
 
                 ElevatedButton.icon(
                   icon: Image.network(
-                    'https://res.cloudinary.com/dfznn7pui/image/upload/v1760138499/google_wkaueo.png', // <-- AQUÍ PUEDES PONER TU URL para el ícono del botón
+                    'https://res.cloudinary.com/dfznn7pui/image/upload/v1760138499/google_wkaueo.png',
                     height: 24.0,
                   ),
                   label: const Text('Inicia sesión con Google'),
@@ -286,7 +312,7 @@ class LoginPage extends StatelessWidget {
                     // TODO: Implementar la lógica de inicio de sesión con Google.
                   },
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.black87,
+                    foregroundColor: Colors.grey,
                     backgroundColor: Colors.grey[200],
                     minimumSize: const Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(
@@ -300,38 +326,6 @@ class LoginPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 48.0),
 
-                // Logo inferior de la marca.
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(
-                      Icons.house_outlined,
-                      color: Color(0XFF2CB7A6),
-                      size: 40,
-                    ),
-                    SizedBox(width: 8),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'TURQUESA',
-                          style: TextStyle(
-                            color: Color(0XFF2CB7A6),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                        Text(
-                          'HOSTAL',
-                          style: TextStyle(
-                            color: Color(0XFF2CB7A6),
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
                 const SizedBox(height: 24.0),
               ],
             ),
@@ -339,5 +333,14 @@ class LoginPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // Es una buena práctica liberar los controladores cuando el widget se destruye
+  // para evitar fugas de memoria.
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }

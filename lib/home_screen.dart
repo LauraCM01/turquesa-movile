@@ -1,45 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/models/room.dart';
 import './calendar_page.dart';
+import 'widgets/barranavegacion.dart';
+import './chat_screen.dart';
+import './inicio.dart';
+import './perfil_screen.dart';
+import 'widgets/room_card.dart';
 
-const Color kPrimaryColor = Color(0xFF4DB6AC); // Un turquesa bonito
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
-// --- 1. Modelo de Datos (Simulación) ---
-// Representa una Habitación con sus datos esenciales.
-class Room {
-  final String name;
-  final String imageUrl;
-  final String id;
-
-  Room({required this.name, required this.imageUrl, required this.id});
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-// --- 2. Pantalla Principal de la Aplicación ---
-class HomeScreen extends StatelessWidget {
-  // Lista de habitaciones simuladas (4 para cumplir la corrección)
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 1;
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  // Lista de habitaciones simuladas
   final List<Room> dummyRooms = [
     Room(
-      name: 'Doble Premium',
-      imageUrl: 'https://placehold.co/600x400/80CBC4/FFFFFF?text=Doble',
+      name: 'Habitación Familiar',
+      imageUrl:
+          'https://res.cloudinary.com/dfznn7pui/image/upload/v1760064533/habitacion_9_mhcbqn.png',
       id: 'R001',
     ),
     Room(
-      name: 'Familiar Vista Mar',
-      imageUrl: 'https://placehold.co/600x400/4DB6AC/FFFFFF?text=Familiar',
+      name: 'Habitación Doble',
+      imageUrl:
+          'https://res.cloudinary.com/dfznn7pui/image/upload/v1760066812/habitacion_11_b4afjs.png',
       id: 'R002',
     ),
     Room(
-      name: 'Individual Estándar',
-      imageUrl: 'https://placehold.co/600x400/26A69A/FFFFFF?text=Individual',
+      name: 'Habitación Triple',
+      imageUrl:
+          'https://res.cloudinary.com/dfznn7pui/image/upload/v1760064533/habitacion_9_mhcbqn.png',
       id: 'R003',
     ),
     Room(
-      name: 'Suite Deluxe',
-      imageUrl: 'https://placehold.co/600x400/00897B/FFFFFF?text=Suite',
+      name: 'Habitación Suite',
+      imageUrl:
+          'https://res.cloudinary.com/dfznn7pui/image/upload/v1760064532/habitacion_3_tyjjyj.png',
       id: 'R004',
     ),
+    Room(
+      name: 'Habitación Familiar',
+      imageUrl:
+          'https://res.cloudinary.com/dfznn7pui/image/upload/v1760064532/habitacion_3_tyjjyj.png',
+      id: 'R005',
+    ),
+    Room(
+      name: 'Habitación Doble',
+      imageUrl:
+          'https://res.cloudinary.com/dfznn7pui/image/upload/v1760064532/habitacion_3_tyjjyj.png',
+      id: 'R006',
+    ),
   ];
-
-  HomeScreen({super.key});
 
   // Función de ejemplo para agregar una habitación (Aquí integrarás Firebase después)
   void _addRoom() {
@@ -53,101 +74,129 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // 1. Barra superior (AppBar)
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(
-              Icons.house_siding_rounded,
-              color: kPrimaryColor,
-              size: 28,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              'TURQUESA HOSTAL',
-              style: TextStyle(
-                color: kPrimaryColor,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-          ],
-        ),
+    return MaterialApp(
+      title: 'Turquesa Hostal',
+      theme: ThemeData(
+        primaryColor: Color(0XFF2CB7A6),
+        useMaterial3: true,
+        fontFamily: 'Poppins',
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            // 2. Barra de Búsqueda
-            _buildSearchBar(),
-            const SizedBox(height: 20),
 
-            // 3. Grid de 2x2 para las Habitaciones
-            Expanded(
-              child: GridView.count(
-                // Esto define el layout 2x2
-                crossAxisCount: 2,
-                crossAxisSpacing: 16.0, // Espacio horizontal entre tarjetas
-                mainAxisSpacing: 16.0, // Espacio vertical entre tarjetas
-                children: dummyRooms.map((room) {
-                  return _RoomCard(room: room);
-                }).toList(),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // 4. Botón de Agregar Habitación
-            ElevatedButton.icon(
-              onPressed: _addRoom,
-              icon: const Icon(Icons.add, color: Colors.white),
-              label: const Padding(
-                padding: EdgeInsets.symmetric(vertical: 12.0),
-                child: Text(
-                  '+ AGREGAR HABITACIÓN',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+      home: Scaffold(
+        backgroundColor: Colors.white,
+        // 1. Barra superior (AppBar)
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          scrolledUnderElevation: 0.0,
+          // MODIFICACIÓN 1: Aumentar la altura de la barra (el valor por defecto es ~56.0)
+          toolbarHeight: 80.0, // Puedes ajustar este valor
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 10.0,
+                  horizontal: 10.0,
+                ), // Agrega margen vertical y horizontal
+                child: SizedBox(
+                  width: 150,
+                  child: Image.network(
+                    'https://res.cloudinary.com/dfznn7pui/image/upload/v1761514333/LOGO-HOSTAL_yvkmmi.png',
+                    fit: BoxFit.contain,
+                    loadingBuilder:
+                        (
+                          BuildContext context,
+                          Widget child,
+                          ImageChunkEvent? loadingProgress,
+                        ) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
+                        },
+                    errorBuilder:
+                        (
+                          BuildContext context,
+                          Object exception,
+                          StackTrace? stackTrace,
+                        ) {
+                          return const Icon(Icons.error, color: Colors.red);
+                        },
                   ),
                 ),
               ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: kPrimaryColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 5,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-      // 5. Barra de Navegación Inferior (simulada del diseño original)
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: kPrimaryColor,
-        unselectedItemColor: Colors.grey[400],
-        backgroundColor: Colors.white,
-        elevation: 10,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline),
-            label: 'Chat',
+
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              // 2. Barra de Búsqueda
+              _buildSearchBar(),
+              const SizedBox(height: 20),
+
+              // 3. Grid de 2x2 para las Habitaciones
+              Expanded(
+                child: GridView.count(
+                  padding: const EdgeInsets.only(
+                    top: 0.0,
+                    left: 16.0,
+                    right: 16.0,
+                    bottom: 10.0,
+                  ),
+
+                  // Esto define el layout 2x2
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 16.0, // Espacio horizontal entre tarjetas
+                  mainAxisSpacing: 16.0, // Espacio vertical entre tarjetas
+                  children: dummyRooms.map((room) {
+                    return RoomCard(room: room);
+                  }).toList(),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // 4. Botón de Agregar Habitación
+              ElevatedButton.icon(
+                onPressed: _addRoom,
+                icon: const Icon(Icons.add, color: Colors.white),
+                label: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 12.0),
+                  child: Text(
+                    'AGREGAR HABITACIÓN',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0XFF2CB7A6),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 5,
+                ),
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_filled),
-            label: 'Inicio',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Perfil',
-          ),
-        ],
+        ),
+        // 5. Barra de Navegación Inferior (simulada del diseño original)
+        bottomNavigationBar: BarraNavegacion(
+          selectedIndex: _selectedIndex,
+          onItemTapped: _onItemTapped,
+        ),
       ),
     );
   }
@@ -155,127 +204,32 @@ class HomeScreen extends StatelessWidget {
   // Widget para la Barra de Búsqueda
   Widget _buildSearchBar() {
     return Container(
+      // ELIMINAMOS el padding del Container
+      // padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
       decoration: BoxDecoration(
-        color: Colors.grey[200],
-        borderRadius: BorderRadius.circular(10),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+        border: Border.all(
+        color: Colors.grey.shade400, // Un gris claro para un borde sutil
+        width: 1.0, // Un ancho de 1.0 es generalmente bueno para la sutileza
+        ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: const TextField(
         decoration: InputDecoration(
           hintText: 'Buscador',
           hintStyle: TextStyle(color: Colors.grey),
           prefixIcon: Icon(Icons.search, color: Colors.grey),
           border: InputBorder.none,
-          isDense: true, // Reduce el espacio vertical
+
+          contentPadding: EdgeInsets.only(
+            top: 10.0,
+            bottom: 10.0,
+            left: 0.0,
+            right: 0.0,
+          ),
         ),
         style: TextStyle(fontSize: 16),
       ),
     );
   }
 }
-
-// --- 3. Tarjeta de Habitación (La clave para la forma cuadrada) ---
-class _RoomCard extends StatelessWidget {
-  final Room room;
-
-  const _RoomCard({required this.room});
-
-  @override
-  Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 1.0, // ¡Esto asegura que la tarjeta SIEMPRE sea cuadrada!
-      child: Card(
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        elevation: 8,
-        child: Column(
-          children: [
-            // Imagen ocupando la mayor parte del espacio
-            Expanded(
-              flex: 3,
-              child: Ink.image(
-                image: NetworkImage(room.imageUrl),
-                fit: BoxFit.cover,
-                child: InkWell(
-                  onTap: () {
-                    // Acción al tocar la imagen
-                    debugPrint('Ver detalles de ${room.name}');
-                  },
-                ),
-              ),
-            ),
-            // Nombre y Botón '+'
-            Expanded(
-              flex: 1,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // Nombre
-                    Flexible(
-                      child: Text(
-                        room.name,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    // Botón '+'
-                    IconButton(
-                      icon: const Icon(
-                        Icons.add_circle,
-                        color: kPrimaryColor,
-                        size: 28,
-                      ),
-                      onPressed: () {
-                        // Acción al presionar el '+'
-                        //debugPrint('Agregado: ${room.name}');
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => CalendarPage(),
-                          ),
-                        );
-                      },
-                      padding: EdgeInsets
-                          .zero, // Elimina el padding extra para que el ícono sea más grande
-                      constraints:
-                          const BoxConstraints(), // Elimina restricciones de tamaño
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// --- 4. Configuración Inicial de la App (en lib/main.dart) ---
-// Normalmente, este código iría en main.dart para arrancar la app.
-/*
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Turquesa Hostal',
-      theme: ThemeData(
-        primaryColor: kPrimaryColor,
-        useMaterial3: true,
-        fontFamily: 'Inter', // Puedes usar otra fuente si lo deseas
-      ),
-      home: HomeScreen(), // ¡Aquí llamamos a la pantalla que creamos!
-    );
-  }
-}
-*/

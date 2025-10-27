@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/inicio.dart';
+import './loging.dart';
+
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'package:myapp/providers/room_provider.dart';
+
+//void main() => runApp(const Inicio());
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

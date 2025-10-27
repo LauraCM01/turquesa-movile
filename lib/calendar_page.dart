@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/widgets/barranavegacion.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
-import './screens/room_details_screen.dart';
+import 'room_details_screen.dart';
 import './reservation_form.dart';
 
 // ----------------------------------------------------
 // 1. CONSTANTES Y MODELO DE DATOS
 // ----------------------------------------------------
-const Color kPrimaryColor = Color(0xFF1ABC9C);
+const Color kPrimaryColor = Color(0XFF2CB7A6);
 const Color kReservedColor = Color(0xFFE53935);
 const Color kAvailableColor = Color(0xFFE0E0E0);
 
@@ -43,6 +44,13 @@ class _CalendarPageState extends State<CalendarPage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   PageController? _pageController;
 
+  int _selectedIndex = 0;
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   // Variables de Rango (NECESARIAS si usaste el código de rangos, aunque no las uses)
   DateTime? _rangeStart;
   DateTime? _rangeEnd;
@@ -61,7 +69,11 @@ class _CalendarPageState extends State<CalendarPage> {
       });
       //print('Día seleccionado: $selectedDay');
 
-      final normalizedDay = DateTime.utc(selectedDay.year, selectedDay.month, selectedDay.day);
+      final normalizedDay = DateTime.utc(
+        selectedDay.year,
+        selectedDay.month,
+        selectedDay.day,
+      );
       final String status = hostelAvailability[normalizedDay] ?? 'Disponible';
 
       if (status == 'Reservado') {
@@ -136,7 +148,7 @@ class _CalendarPageState extends State<CalendarPage> {
     else {
       final String status = hostelAvailability[normalizedDay] ?? 'Disponible';
       backgroundColor = statusColors[status] ?? kAvailableColor;
-      textColor = (status == 'Disponible') ? Colors.black87 : Colors.white;
+      textColor = (status == 'Disponible') ? Colors.grey : Colors.white;
     }
 
     // Contenedor circular
@@ -180,12 +192,6 @@ class _CalendarPageState extends State<CalendarPage> {
           'Habitación doble',
           style: TextStyle(color: kPrimaryColor, fontWeight: FontWeight.bold),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit, color: kPrimaryColor),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -199,8 +205,8 @@ class _CalendarPageState extends State<CalendarPage> {
                   height: 150,
                   width: double.infinity,
                   color: Colors.grey[300],
-                  child: Image.asset(
-                    'assets/images/habitacion.jpg', // REEMPLAZA CON EL NOMBRE REAL DE TU ARCHIVO
+                  child: Image.network(
+                    'https://res.cloudinary.com/dfznn7pui/image/upload/v1760068145/pop_9_ilwxua.png', // REEMPLAZA CON EL NOMBRE REAL DE TU ARCHIVO
                     fit: BoxFit
                         .cover, // Para que la imagen cubra todo el espacio
                   ),
@@ -233,7 +239,7 @@ class _CalendarPageState extends State<CalendarPage> {
                         icon: const Icon(
                           Icons.arrow_back_ios,
                           size: 16,
-                          color: Colors.black54,
+                          color: Colors.grey,
                         ),
                         onPressed: () {
                           _pageController?.previousPage(
@@ -246,7 +252,7 @@ class _CalendarPageState extends State<CalendarPage> {
                         icon: const Icon(
                           Icons.arrow_forward_ios,
                           size: 16,
-                          color: Colors.black54,
+                          color: Colors.grey,
                         ),
                         onPressed: () {
                           _pageController?.nextPage(
@@ -261,71 +267,80 @@ class _CalendarPageState extends State<CalendarPage> {
               ),
             ),
 
-            // El Widget principal del Calendario
-            TableCalendar(
-              onCalendarCreated: (PageController controller) {
-                _pageController = controller;
-              },
-              locale: 'es',
-              firstDay: DateTime.utc(2020, 1, 1),
-              lastDay: DateTime.utc(2030, 12, 31),
-              focusedDay: _focusedDay,
-              calendarFormat: _calendarFormat,
-
-              headerVisible: false, // Ocultamos el header por defecto
-
-              daysOfWeekStyle: const DaysOfWeekStyle(
-                weekdayStyle: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-                weekendStyle: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
-              ),
-
-              calendarStyle: const CalendarStyle(
-                isTodayHighlighted: false,
-                outsideDaysVisible: true,
-                selectedDecoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color.fromRGBO(26, 188, 156, 1),
-                ),
-              ),
-
-              calendarBuilders: CalendarBuilders(
-                defaultBuilder: (context, day, focusedDay) {
-                  return _buildDayContainer(day, focusedDay);
+            // El Widget principal del Calendario (AÑADIMOS EL PADDING AQUÍ)
+            Padding(
+              // 🔥 MODIFICACIÓN CLAVE: Padding horizontal para el calendario
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: TableCalendar(
+                onCalendarCreated: (PageController controller) {
+                  _pageController = controller;
                 },
-                outsideBuilder: (context, day, focusedDay) {
-                  return _buildDayContainer(day, focusedDay);
+                locale: 'es',
+                firstDay: DateTime.utc(2020, 1, 1),
+                lastDay: DateTime.utc(2030, 12, 31),
+                focusedDay: _focusedDay,
+                calendarFormat: _calendarFormat,
+
+                headerVisible: false, // Ocultamos el header por defecto
+
+                daysOfWeekStyle: const DaysOfWeekStyle(
+                  weekdayStyle: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey,
+                  ),
+                  weekendStyle: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey,
+                  ),
+                ),
+
+                calendarStyle: const CalendarStyle(
+                  isTodayHighlighted: false,
+                  outsideDaysVisible: true,
+                  selectedDecoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color.fromRGBO(26, 188, 156, 1),
+                  ),
+                ),
+
+                calendarBuilders: CalendarBuilders(
+                  defaultBuilder: (context, day, focusedDay) {
+                    return _buildDayContainer(day, focusedDay);
+                  },
+                  outsideBuilder: (context, day, focusedDay) {
+                    return _buildDayContainer(day, focusedDay);
+                  },
+                ),
+
+                onDaySelected: _onDaySelected,
+                selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+                onPageChanged: (focusedDay) {
+                  setState(() {
+                    _focusedDay = focusedDay;
+                  });
                 },
               ),
-
-              onDaySelected: _onDaySelected,
-              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-              onPageChanged: (focusedDay) {
-                setState(() {
-                  _focusedDay = focusedDay;
-                });
-              },
             ),
 
             const SizedBox(height: 20),
 
             // LEYENDA (Los 3 Estados)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              padding: const EdgeInsets.only(
+                left: 16.0,
+                right: 16.0,
+                top: 10.0,
+                bottom: 40.0,
+              ),
+              child: Wrap(
+                spacing: 16.0,
+                runSpacing: 8.0, // Espacio vertical entre líneas si hace wrap
+                alignment: WrapAlignment.center, // Centra los ítems
+
                 children: [
                   _buildLegendItem(kPrimaryColor, 'Seleccionado'),
-                  const SizedBox(width: 25),
                   _buildLegendItem(kReservedColor, 'Reservado'),
-                  const SizedBox(width: 25),
                   _buildLegendItem(kAvailableColor, 'Disponible'),
-                  const SizedBox(width: 25),
                   _buildLegendItem(
                     const Color.fromARGB(255, 99, 99, 97),
                     'Fuera de servicio',
@@ -336,26 +351,16 @@ class _CalendarPageState extends State<CalendarPage> {
           ],
         ),
       ),
-      // Navegación inferior (simulación)
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color.fromRGBO(26, 188, 156, 1),
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white.withOpacity(0.6),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline),
-            label: '',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: ''),
-        ],
+      
+      bottomNavigationBar: BarraNavegacion(
+        selectedIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
       ),
     );
   }
 }
 
 // FUNCIONES AUXILIARES (DEBEN IR FUERA DE LA CLASE _CalendarPageState)
-
 // Función auxiliar para construir los ítems de la leyenda
 Widget _buildLegendItem(Color color, String text) {
   return Row(
@@ -367,7 +372,17 @@ Widget _buildLegendItem(Color color, String text) {
         decoration: BoxDecoration(color: color, shape: BoxShape.circle),
       ),
       const SizedBox(width: 5),
-      Text(text, style: const TextStyle(fontSize: 14)),
+      Text(
+        text,
+        // 🔥 MODIFICACIÓN CLAVE: Cambiar color y tamaño de fuente aquí
+        style: const TextStyle(
+          fontSize: 12, // <-- Aumentar el tamaño a 16 (puedes ajustar)
+          color:
+              Colors.grey, // <-- Cambiar a color negro (o el color que desees)
+          fontWeight:
+              FontWeight.normal, // Opcional: Define el peso de la fuente
+        ),
+      ),
     ],
   );
 }

@@ -68,6 +68,15 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
+fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700 # Puedes definir el peso (bold)
+        - asset: assets/fonts/Poppins-Italic.ttf
+          style: italic # Puedes definir el estilo (cursiva)
+
   # To add assets to your application, add an assets section, like this:
   #assets:
   #  - assets/images/

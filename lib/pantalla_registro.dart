@@ -33,7 +33,7 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Color(0XFF2CB7A6)),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -48,16 +48,69 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  const SizedBox(height: 60),
-                  const CircleAvatar(
-                    radius: 50,
-                    backgroundColor: Color(0xFF26A69A),
-                    child: Icon(
-                      Icons.person_outline,
-                      size: 60,
-                      color: Colors.white,
+
+                // Logo de la marca.
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      // Define el ancho y alto deseado para tu logo.
+                      width: 200, // Ejemplo de ancho
+                      child: Image.network(
+                        // ¡TODO: Reemplaza esta URL de ejemplo con la URL real de tu logo!
+                        'https://res.cloudinary.com/dfznn7pui/image/upload/v1761514333/LOGO-HOSTAL_yvkmmi.png',
+                        fit: BoxFit
+                            .contain, // Ajusta cómo se muestra la imagen dentro del SizedBox
+                        loadingBuilder:
+                            (
+                              BuildContext context,
+                              Widget child,
+                              ImageChunkEvent? loadingProgress,
+                            ) {
+                              if (loadingProgress == null) return child;
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  value:
+                                      loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                      : null,
+                                ),
+                              );
+                            },
+                        errorBuilder:
+                            (
+                              BuildContext context,
+                              Object exception,
+                              StackTrace? stackTrace,
+                            ) {
+                              // Widget a mostrar si la imagen no se puede cargar (por ejemplo, un ícono o texto de error)
+                              return const Icon(Icons.error, color: Colors.red);
+                            },
+                      ),
                     ),
+                  ],
+                ),
+
+                // Icono usuario.
+                Padding(
+                  // Aplica 20.0 de margen en la parte superior (top)
+                  // y 20.0 a la izquierda y derecha (left, right).
+                  // La parte inferior (bottom) se queda en 0.0.
+                  padding: const EdgeInsets.only(
+                    top: 40.0,
+                    bottom: 0.0, // O simplemente omites el 'bottom' ya que por defecto es 0.0
                   ),
+                  child: const CircleAvatar(
+                    // Tamaño reducido
+                    radius: 50,
+                    backgroundColor: Color(0XFF2CB7A6),
+                    child: Icon(Icons.person, size: 50, color: Colors.white),
+                  ),
+                ),
+                const SizedBox(height: 20.0),
+
+
                   const SizedBox(height: 40),
                   _buildTextFormField(
                     controller: _nombreController,
@@ -88,7 +141,7 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
                   const SizedBox(height: 40),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF26A69A),
+                      backgroundColor: const Color(0XFF2CB7A6),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
@@ -106,29 +159,6 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
                       style: TextStyle(
                         fontSize: 18,
                         color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Colors.black54,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                        side: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      elevation: 2,
-                    ),
-                    onPressed: () {
-                      // Botón no funcional
-                    },
-                    child: const Text(
-                      'REGISTRATE CON GOOGLE',
-                      style: TextStyle(
-                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -157,8 +187,6 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
                     ],
                   ),
                   const SizedBox(height: 60),
-                  Image.asset('assets/images/LOGO-HOSTAL.png', height: 50),
-                  const SizedBox(height: 20),
                 ],
               ),
             ),
@@ -199,7 +227,7 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
-          borderSide: const BorderSide(color: Color(0xFF26A69A)),
+          borderSide: const BorderSide(color: Color(0XFF2CB7A6)),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30),
