@@ -192,6 +192,7 @@ class _CalendarPageState extends State<CalendarPage> {
           'Habitación doble',
           style: TextStyle(color: kPrimaryColor, fontWeight: FontWeight.bold),
         ),
+
       ),
       body: SingleChildScrollView(
         child: Column(

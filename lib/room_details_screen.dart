@@ -13,11 +13,9 @@ class RoomDetailsScreen extends StatefulWidget {
 }
 
 class _RoomDetailsScreenState extends State<RoomDetailsScreen> {
-  // 🔥 1. VARIABLES DE ESTADO NECESARIAS
-  // Usamos -1 para que la barra no marque ningún ítem visualmente
-  int _selectedIndex = 1;
 
-  void _onItemTapped(int index) {
+  int _selectedIndex = 1;
+void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
@@ -32,6 +30,9 @@ class _RoomDetailsScreenState extends State<RoomDetailsScreen> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
+        elevation: 0.0, // Elimina la sombra cuando NO hay scroll
+        scrolledUnderElevation: 0.0, // Elimina la sombra cuando SÍ hay scroll
+        surfaceTintColor: Colors.transparent, // Asegura que el color de fondo no cambie por el tema
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0XFF2CB7A6)),
           onPressed: () {

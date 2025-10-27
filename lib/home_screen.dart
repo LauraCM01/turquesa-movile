@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/models/room.dart';
-import './calendar_page.dart';
 import 'widgets/barranavegacion.dart';
-import './chat_screen.dart';
-import './inicio.dart';
-import './perfil_screen.dart';
 import 'widgets/room_card.dart';
 
 class HomeScreen extends StatefulWidget {
