@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:myapp/models/room.dart';
 import 'widgets/barranavegacion.dart';
 import 'widgets/room_card.dart';
@@ -73,9 +74,11 @@ class _HomeScreenState extends State<HomeScreen> {
     return MaterialApp(
       title: 'Turquesa Hostal',
       theme: ThemeData(
-        primaryColor: Color(0XFF2CB7A6),
+        primaryColor: const Color(0XFF2CB7A6),
         useMaterial3: true,
-        fontFamily: 'Poppins',
+        textTheme: GoogleFonts.poppinsTextTheme(
+          Theme.of(context).textTheme,
+        ),
       ),
 
       home: Scaffold(
@@ -166,11 +169,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ElevatedButton.icon(
                 onPressed: _addRoom,
                 icon: const Icon(Icons.add, color: Colors.white),
-                label: const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 12.0),
+                label: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
                   child: Text(
                     'AGREGAR HABITACIÓN',
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -178,7 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0XFF2CB7A6),
+                  backgroundColor: const Color(0XFF2CB7A6),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -210,21 +213,21 @@ class _HomeScreenState extends State<HomeScreen> {
         width: 1.0, // Un ancho de 1.0 es generalmente bueno para la sutileza
         ),
       ),
-      child: const TextField(
+      child: TextField(
         decoration: InputDecoration(
           hintText: 'Buscador',
-          hintStyle: TextStyle(color: Colors.grey),
-          prefixIcon: Icon(Icons.search, color: Colors.grey),
+          hintStyle: GoogleFonts.poppins(color: Colors.grey),
+          prefixIcon: const Icon(Icons.search, color: Colors.grey),
           border: InputBorder.none,
 
-          contentPadding: EdgeInsets.only(
+          contentPadding: const EdgeInsets.only(
             top: 10.0,
             bottom: 10.0,
             left: 0.0,
             right: 0.0,
           ),
         ),
-        style: TextStyle(fontSize: 16),
+        style: GoogleFonts.poppins(fontSize: 16),
       ),
     );
   }

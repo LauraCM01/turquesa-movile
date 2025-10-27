@@ -1,5 +1,6 @@
 // Importa la biblioteca principal de Material Design de Flutter.
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import './home_screen.dart';
 import './pantalla_registro.dart';
 
@@ -110,7 +111,7 @@ class _LoginPageState extends State<LoginPage> {
                 // Campo de texto para el nombre de usuario (Username).
                 TextFormField(
                   controller: _usernameController, // Asocia el controlador.
-                  style: const TextStyle(fontSize: 18.0, color: Colors.grey),
+                  style: GoogleFonts.poppins(fontSize: 16.0, color: Colors.grey),
                   decoration: InputDecoration(
                     prefixIcon: const Icon(
                       Icons.person_outline,
@@ -148,7 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                 TextFormField(
                   controller: _passwordController, // Asocia el controlador.
                   obscureText: true, // Oculta el texto.
-                  style: const TextStyle(fontSize: 18.0, color: Colors.grey),
+                  style: GoogleFonts.poppins(fontSize: 16.0, color: Colors.grey),
                   decoration: InputDecoration(
                     prefixIcon: const Icon(
                       Icons.lock_outline,
@@ -191,7 +192,7 @@ class _LoginPageState extends State<LoginPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30.0),
                     ),
-                    textStyle: const TextStyle(
+                    textStyle: GoogleFonts.poppins(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
@@ -230,16 +231,19 @@ class _LoginPageState extends State<LoginPage> {
                           },
                           activeColor: const Color(0XFF2CB7A6),
                         ),
-                        const Text(
+                        Text(
                           'Recordar',
-                          style: TextStyle(fontSize: 16.0),
+                          style: GoogleFonts.poppins(
+                            fontSize: 14.0,
+                            color: Colors.grey,
+                            ),
                         ),
                       ],
                     ),
                     TextButton(
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.grey,
-                        textStyle: const TextStyle(fontSize: 16.0),
+                        textStyle: GoogleFonts.poppins(fontSize: 14.0),
                       ),
                       onPressed: () {},
                       child: const Text('Recuperar contraseña'),
@@ -251,9 +255,12 @@ class _LoginPageState extends State<LoginPage> {
                 // Sección para crear una nueva cuenta.
                 Column(
                   children: [
-                    const Text(
+                    Text(
                       '¿Todavía no tienes cuenta?',
-                      style: TextStyle(fontSize: 16.0),
+                      style: GoogleFonts.poppins(
+                        fontSize: 14.0,
+                        color: Colors.grey,
+                        ),
                     ),
                     const SizedBox(height: 16.0),
                     ElevatedButton(
@@ -267,7 +274,7 @@ class _LoginPageState extends State<LoginPage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30.0),
                         ),
-                        textStyle: const TextStyle(
+                        textStyle: GoogleFonts.poppins(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -290,14 +297,14 @@ class _LoginPageState extends State<LoginPage> {
                 Row(
                   children: <Widget>[
                     Expanded(child: Divider(color: Colors.grey.shade400)),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.0),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Text(
                         "O",
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                        style: GoogleFonts.poppins(color: Colors.grey, fontSize: 16),
                       ),
                     ),
-                    Expanded(child: Divider(color: Colors.grey.shade400)),
+                    Expanded(child: Divider(color: Colors.grey)),
                   ],
                 ),
                 const SizedBox(height: 24.0),
@@ -318,7 +325,7 @@ class _LoginPageState extends State<LoginPage> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    textStyle: const TextStyle(
+                    textStyle: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
                     ),

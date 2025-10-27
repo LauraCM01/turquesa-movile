@@ -4,6 +4,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'room_details_screen.dart';
 import './reservation_form.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // ----------------------------------------------------
 // 1. CONSTANTES Y MODELO DE DATOS
@@ -188,9 +189,12 @@ class _CalendarPageState extends State<CalendarPage> {
         backgroundColor: Color.fromARGB(255, 255, 255, 255),
         elevation: 0,
         leading: const BackButton(color: kPrimaryColor),
-        title: const Text(
+        title: Text(
           'Habitación doble',
-          style: TextStyle(color: kPrimaryColor, fontWeight: FontWeight.bold),
+          style: GoogleFonts.poppins(
+            color: const Color(0XFF2CB7A6),
+            fontWeight: FontWeight.bold,
+          ),
         ),
 
       ),

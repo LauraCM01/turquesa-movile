@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import './home_screen.dart';
 
 class PantallaRegistro extends StatefulWidget {
@@ -92,25 +93,6 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
                   ],
                 ),
 
-                // Icono usuario.
-                Padding(
-                  // Aplica 20.0 de margen en la parte superior (top)
-                  // y 20.0 a la izquierda y derecha (left, right).
-                  // La parte inferior (bottom) se queda en 0.0.
-                  padding: const EdgeInsets.only(
-                    top: 40.0,
-                    bottom: 0.0, // O simplemente omites el 'bottom' ya que por defecto es 0.0
-                  ),
-                  child: const CircleAvatar(
-                    // Tamaño reducido
-                    radius: 50,
-                    backgroundColor: Color(0XFF2CB7A6),
-                    child: Icon(Icons.person, size: 50, color: Colors.white),
-                  ),
-                ),
-                const SizedBox(height: 20.0),
-
-
                   const SizedBox(height: 40),
                   _buildTextFormField(
                     controller: _nombreController,
@@ -150,13 +132,13 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => HomeScreen()),
+                          MaterialPageRoute(builder: (context) => const HomeScreen()),
                         );
                       }
                     },
-                    child: const Text(
+                    child: Text(
                       'INGRESAR',
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         fontSize: 18,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -167,19 +149,19 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         'Ya tienes una cuenta?',
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                        style: GoogleFonts.poppins(color: Colors.grey, fontSize: 16),
                       ),
                       TextButton(
                         onPressed: () {
                           // Navegar a la pantalla de login
                           Navigator.of(context).pop();
                         },
-                        child: const Text(
+                        child: Text(
                           'Volver',
-                          style: TextStyle(
-                            color: Color(0xFF26A69A),
+                          style: GoogleFonts.poppins(
+                            color: const Color(0xFF26A69A),
                             fontSize: 16,
                           ),
                         ),
@@ -216,9 +198,10 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
         }
         return null;
       },
+      style: GoogleFonts.poppins(),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.grey.shade400),
+        hintStyle: GoogleFonts.poppins(color: Colors.grey.shade400),
         filled: true,
         fillColor: Colors.white,
         enabledBorder: OutlineInputBorder(

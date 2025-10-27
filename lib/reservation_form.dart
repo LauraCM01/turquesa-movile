@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -13,33 +15,30 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // Opcionalmente, podrías definir el locale aquí si quisieras cambiarlo dinámicamente
-  // Locale _currentLocale = const Locale('es');
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Formulario de Reserva',
       debugShowCheckedModeBanner: false,
-      // Añadir soporte de localización para español
+      theme: ThemeData(
+        textTheme: GoogleFonts.poppinsTextTheme(
+          Theme.of(context).textTheme,
+        ),
+      ),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: const [
-        Locale('en', ''), // Inglés (por defecto)
-        Locale('es', ''), // Español
+        Locale('en', ''), // English
+        Locale('es', ''), // Spanish
       ],
-      // Mantener la localización de la aplicación en español
-      locale: const Locale('es'), 
+      locale: const Locale('es'),
       home: const ReservationForm(),
     );
   }
 }
-// ==========================================================
-// FIN DE LA MODIFICACIÓN
-// ==========================================================
 
 class ReservationForm extends StatefulWidget {
   const ReservationForm({super.key});
@@ -59,7 +58,7 @@ class _ReservationFormState extends State<ReservationForm> {
   final TextEditingController _reservationNumberController =
       TextEditingController();
 
-  final primaryColor = const Color(0XFF2CB7A6); // Definimos el color aquí
+  final primaryColor = const Color(0XFF2CB7A6); // Color principal
 
   @override
   void dispose() {
@@ -72,6 +71,96 @@ class _ReservationFormState extends State<ReservationForm> {
     super.dispose();
   }
 
+  /// Muestra un diálogo de confirmación de reserva con los datos capturados.
+  void _showSuccessDialog() {
+    // Recopilar todos los datos de los controladores
+    final reservationData = {
+      'Huésped': _nameController.text,
+      'Personas': _personsController.text,
+      'Llegada': _arrivalDateController.text,
+      'Salida': _departureDateController.text,
+      'Celular': _phoneController.text,
+      'No. Reserva': _reservationNumberController.text,
+    };
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+          title: Text(
+            '¡Reserva Creada con Éxito!',
+            style: GoogleFonts.poppins(
+              color: primaryColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+            ),
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: reservationData.entries.map((entry) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${entry.key}: ',
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          entry.value,
+                          style: GoogleFonts.poppins(
+                            color: Colors.black54,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cierra el diálogo
+                // Limpia el formulario
+                _formKey.currentState?.reset();
+                _nameController.clear();
+                _personsController.clear();
+                _arrivalDateController.clear();
+                _departureDateController.clear();
+                _phoneController.clear();
+                _reservationNumberController.clear();
+              },
+              child: Text(
+                'ACEPTAR',
+                style: GoogleFonts.poppins(
+                  color: primaryColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  /// Maneja la validación y el envío del formulario.
+  void _submitForm() {
+    if (_formKey.currentState!.validate()) {
+      // El formulario es válido, se procede a mostrar el diálogo de éxito
+      _showSuccessDialog();
+    }
+  }
+
   Future<void> _selectDate(
     BuildContext context,
     TextEditingController controller,
@@ -82,6 +171,8 @@ class _ReservationFormState extends State<ReservationForm> {
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
       builder: (BuildContext context, Widget? child) {
+        // CORRECCIÓN: Se añaden los delegados de localización a Localizations.override
+        // para que el DatePickerDialog tenga acceso a las MaterialLocalizations.
         return Localizations.override(
           context: context,
           locale: const Locale('es'),
@@ -92,19 +183,19 @@ class _ReservationFormState extends State<ReservationForm> {
           ],
           child: Theme(
             data: ThemeData.light().copyWith(
-              // Color del texto y encabezados
-              colorScheme: ColorScheme.light(
-                primary: primaryColor, // Color de los días seleccionados y encabezado (turquesa)
-                onPrimary: Colors.white, // Color del texto en el día seleccionado (blanco)
-                onSurface: Colors.black, // Color del texto de los días (negro)
+              textTheme: GoogleFonts.poppinsTextTheme(
+                Theme.of(context).textTheme,
               ),
-              // Color de los botones (CANCELAR / OK)
+              colorScheme: ColorScheme.light(
+                primary: primaryColor,
+                onPrimary: Colors.white,
+                onSurface: Colors.black,
+              ),
               textButtonTheme: TextButtonThemeData(
                 style: TextButton.styleFrom(
-                  foregroundColor: primaryColor, // Color del texto de los botones (turquesa)
+                  foregroundColor: primaryColor,
                 ),
               ),
-              // Aplicamos la forma del diálogo usando datePickerTheme
               datePickerTheme: DatePickerThemeData(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15.0),
@@ -116,9 +207,8 @@ class _ReservationFormState extends State<ReservationForm> {
           ),
         );
       },
-    ); // <-- Cierre de showDatePicker
+    );
 
-    // Lógica para actualizar la fecha, ahora correctamente fuera del builder
     if (picked != null) {
       setState(() {
         controller.text = DateFormat('dd/MM/yyyy').format(picked);
@@ -137,18 +227,18 @@ class _ReservationFormState extends State<ReservationForm> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 0.0, // Elimina la sombra cuando NO hay scroll
-        scrolledUnderElevation: 0.0, // Elimina la sombra cuando SÍ hay scroll
-        surfaceTintColor: Colors.transparent, // Asegura que el color de fondo no cambie por el tema
+        elevation: 0.0,
+        scrolledUnderElevation: 0.0,
+        surfaceTintColor: Colors.transparent,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: primaryColor),
           onPressed: () {
-            // Navigator.pop(context); // Comentado para evitar errores de navegación en Canvas simple
+            Navigator.pop(context);
           },
         ),
         title: Text(
           'Formulario',
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             color: primaryColor,
             fontWeight: FontWeight.bold,
           ),
@@ -156,118 +246,122 @@ class _ReservationFormState extends State<ReservationForm> {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 20),
-              _buildTextField(
-                context: context,
-                controller: _nameController,
-                label: 'Nombre del huésped',
-                inputDecoration: InputDecoration(
-                  border: outlineInputBorder,
-                  enabledBorder: outlineInputBorder,
-                  focusedBorder: outlineInputBorder,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                ),
-              ),
-              const SizedBox(height: 32),
-              _buildTextField(
-                context: context,
-                controller: _personsController,
-                label: 'Número de personas',
-                keyboardType: TextInputType.number,
-                inputDecoration: InputDecoration(
-                  border: outlineInputBorder,
-                  enabledBorder: outlineInputBorder,
-                  focusedBorder: outlineInputBorder,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                ),
-              ),
-              const SizedBox(height: 32),
-              _buildDateField(
-                context: context,
-                controller: _arrivalDateController,
-                label: 'Llegada',
-                inputDecoration: InputDecoration(
-                  border: outlineInputBorder,
-                  enabledBorder: outlineInputBorder,
-                  focusedBorder: outlineInputBorder,
-                  suffixIcon:
-                      Icon(Icons.keyboard_arrow_down, color: primaryColor, size: 30),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                ),
-              ),
-              const SizedBox(height: 32),
-              _buildDateField(
-                context: context,
-                controller: _departureDateController,
-                label: 'Salida',
-                inputDecoration: InputDecoration(
-                  border: outlineInputBorder,
-                  enabledBorder: outlineInputBorder,
-                  focusedBorder: outlineInputBorder,
-                  suffixIcon:
-                      Icon(Icons.keyboard_arrow_down, color: primaryColor, size: 30),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                ),
-              ),
-              const SizedBox(height: 32),
-              _buildTextField(
-                context: context,
-                controller: _phoneController,
-                label: 'Celular',
-                keyboardType: TextInputType.phone,
-                inputDecoration: InputDecoration(
-                  border: outlineInputBorder,
-                  enabledBorder: outlineInputBorder,
-                  focusedBorder: outlineInputBorder,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                ),
-              ),
-              const SizedBox(height: 32),
-              _buildTextField(
-                context: context,
-                controller: _reservationNumberController,
-                label: 'Número de reserva',
-                keyboardType: TextInputType.number,
-                inputDecoration: InputDecoration(
-                  border: outlineInputBorder,
-                  enabledBorder: outlineInputBorder,
-                  focusedBorder: outlineInputBorder,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                ),
-              ),
-              const SizedBox(height: 40),
-              Center(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30.0),
-                    ),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 80, vertical: 20),
-                  ),
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // Process data
-                    }
-                  },
-                  child: const Text(
-                    'CREAR RESERVA',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+        child: Center(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 20),
+                _buildTextField(
+                  context: context,
+                  controller: _nameController,
+                  label: 'Nombre del huésped',
+                  inputDecoration: InputDecoration(
+                    border: outlineInputBorder,
+                    enabledBorder: outlineInputBorder,
+                    focusedBorder: outlineInputBorder,
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   ),
                 ),
-              ),
-              const SizedBox(height: 20),
-            ],
+                const SizedBox(height: 32),
+                _buildTextField(
+                  context: context,
+                  controller: _personsController,
+                  label: 'Número de personas',
+                  keyboardType: TextInputType.number,
+                  inputDecoration: InputDecoration(
+                    border: outlineInputBorder,
+                    enabledBorder: outlineInputBorder,
+                    focusedBorder: outlineInputBorder,
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                _buildDateField(
+                  context: context,
+                  controller: _arrivalDateController,
+                  label: 'Llegada',
+                  inputDecoration: InputDecoration(
+                    border: outlineInputBorder,
+                    enabledBorder: outlineInputBorder,
+                    focusedBorder: outlineInputBorder,
+                    suffixIcon: Icon(Icons.keyboard_arrow_down,
+                        color: primaryColor, size: 30),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                _buildDateField(
+                  context: context,
+                  controller: _departureDateController,
+                  label: 'Salida',
+                  inputDecoration: InputDecoration(
+                    border: outlineInputBorder,
+                    enabledBorder: outlineInputBorder,
+                    focusedBorder: outlineInputBorder,
+                    suffixIcon: Icon(Icons.keyboard_arrow_down,
+                        color: primaryColor, size: 30),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                _buildTextField(
+                  context: context,
+                  controller: _phoneController,
+                  label: 'Celular',
+                  keyboardType: TextInputType.phone,
+                  inputDecoration: InputDecoration(
+                    border: outlineInputBorder,
+                    enabledBorder: outlineInputBorder,
+                    focusedBorder: outlineInputBorder,
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  ),
+                ),
+                const SizedBox(height: 32),
+                _buildTextField(
+                  context: context,
+                  controller: _reservationNumberController,
+                  label: 'Número de reserva',
+                  keyboardType: TextInputType.number,
+                  inputDecoration: InputDecoration(
+                    border: outlineInputBorder,
+                    enabledBorder: outlineInputBorder,
+                    focusedBorder: outlineInputBorder,
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  ),
+                ),
+                const SizedBox(height: 40),
+                Center(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: primaryColor,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 80, vertical: 20),
+                    ),
+                    onPressed: _submitForm, // Llamada al nuevo método de envío
+                    child: Text(
+                      'CREAR RESERVA',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
@@ -275,7 +369,7 @@ class _ReservationFormState extends State<ReservationForm> {
   }
 
   Widget _buildTextField({
-    required BuildContext context, 
+    required BuildContext context,
     required TextEditingController controller,
     required String label,
     TextInputType? keyboardType,
@@ -286,21 +380,24 @@ class _ReservationFormState extends State<ReservationForm> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: Color(0xFF666666),
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+          style: GoogleFonts.poppins(
+            color: const Color(0xFF666666),
+            fontSize: 16,
+            fontWeight: FontWeight.normal,
           ),
         ),
         const SizedBox(height: 12),
-        // Manteniendo el ancho limitado al 90% para demostrar el control de ancho
         SizedBox(
-          width: MediaQuery.of(context).size.width * 0.9, 
+          width: MediaQuery.of(context).size.width * 0.8,
           child: TextFormField(
             controller: controller,
             keyboardType: keyboardType,
-            style: const TextStyle(color: Colors.grey, fontSize: 16),
-            decoration: inputDecoration,
+            style: GoogleFonts.poppins(color: Colors.grey, fontSize: 16),
+            decoration: inputDecoration.copyWith(
+              // Uso de labelText en lugar de hint para mejor accesibilidad y diseño
+              labelStyle: GoogleFonts.poppins(color: primaryColor),
+              floatingLabelStyle: GoogleFonts.poppins(color: primaryColor, fontWeight: FontWeight.bold),
+            ),
             validator: (value) {
               if (value == null || value.isEmpty) {
                 return 'Por favor, ingrese un valor';
@@ -324,21 +421,23 @@ class _ReservationFormState extends State<ReservationForm> {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: Color(0xFF666666),
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+          style: GoogleFonts.poppins(
+            color: const Color(0xFF666666),
+            fontSize: 16,
+            fontWeight: FontWeight.normal,
           ),
         ),
         const SizedBox(height: 12),
-        // Manteniendo el ancho limitado al 90% para demostrar el control de ancho
         SizedBox(
-          width: MediaQuery.of(context).size.width * 0.9, 
+          width: MediaQuery.of(context).size.width * 0.8,
           child: TextFormField(
             controller: controller,
             readOnly: true,
-            style: const TextStyle(color: Colors.grey, fontSize: 16),
-            decoration: inputDecoration,
+            style: GoogleFonts.poppins(color: Colors.grey, fontSize: 16),
+            decoration: inputDecoration.copyWith(
+              labelStyle: GoogleFonts.poppins(color: primaryColor),
+              floatingLabelStyle: GoogleFonts.poppins(color: primaryColor, fontWeight: FontWeight.bold),
+            ),
             onTap: () => _selectDate(context, controller),
             validator: (value) {
               if (value == null || value.isEmpty) {

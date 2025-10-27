@@ -39,10 +39,10 @@ void _onItemTapped(int index) {
             Navigator.pop(context);
           },
         ),
-        title: const Text(
+        title: Text(
           'Habitación doble',
-          style: TextStyle(
-            color: Color(0XFF2CB7A6),
+          style: GoogleFonts.poppins(
+            color: const Color(0XFF2CB7A6),
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -229,9 +229,9 @@ void _onItemTapped(int index) {
                   Icons.check_circle_outline,
                   color: Color(0xFF2CB7A6),
                 ),
-                title: const Text(
+                title: Text(
                   'DISPONIBLE',
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                  style: GoogleFonts.poppins(color: Colors.grey, fontSize: 14),
                 ),
                 onTap: () {
                   // Usamos context.read() ya que no estamos en el método build
@@ -247,9 +247,9 @@ void _onItemTapped(int index) {
                   Icons.cleaning_services,
                   color: Color(0xFF2CB7A6),
                 ),
-                title: const Text(
+                title: Text(
                   'EN LIMPIEZA',
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                  style: GoogleFonts.poppins(color: Colors.grey, fontSize: 14),
                 ),
                 onTap: () {
                   Provider.of<RoomProvider>(
@@ -261,9 +261,9 @@ void _onItemTapped(int index) {
               ),
               ListTile(
                 leading: const Icon(Icons.build, color: Color(0xFF2CB7A6)),
-                title: const Text(
+                title: Text(
                   'MANTENIMIENTO',
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                  style: GoogleFonts.poppins(color: Colors.grey, fontSize: 14),
                 ),
                 onTap: () {
                   Provider.of<RoomProvider>(
@@ -275,9 +275,9 @@ void _onItemTapped(int index) {
               ),
               ListTile(
                 leading: const Icon(Icons.bed, color: Color(0xFF2CB7A6)),
-                title: const Text(
+                title: Text(
                   'OCUPADA',
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                  style: GoogleFonts.poppins(color: Colors.grey, fontSize: 14),
                 ),
                 onTap: () {
                   Provider.of<RoomProvider>(
@@ -295,7 +295,7 @@ void _onItemTapped(int index) {
               onPressed: () => Navigator.pop(context),
               child: Text(
                 'CANCELAR',
-                style: GoogleFonts.roboto(color: Colors.grey),
+                style: GoogleFonts.poppins(color: Colors.grey),
               ),
             ),
           ],
