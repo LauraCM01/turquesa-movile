@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:myapp/widgets/Barra-Navegacion.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
-import 'Pantalla-Estados.dart';
-import 'Formulario-Reservas.dart';
+import 'Pantalla-Estados.dart'; 
+import 'Formulario-Reservas.dart'; 
 import 'package:google_fonts/google_fonts.dart';
 
 // ----------------------------------------------------
@@ -12,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 const Color kPrimaryColor = Color(0XFF2CB7A6);
 const Color kReservedColor = Color(0xFFE53935);
 const Color kAvailableColor = Color(0xFFE0E0E0);
+// Se elimina la constante kUnknownSelectedColor
 
 // Mapeo de estados fijos a colores
 Map<String, Color> statusColors = {
@@ -39,13 +40,13 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
-  // 1. DECLARACIÓN DE VARIABLES DE ESTADO (CORREGIDO Y UNIFICADO)
+  // 1. DECLARACIÓN DE VARIABLES DE ESTADO
   DateTime _focusedDay = DateTime.utc(2025, 9, 1);
-  DateTime? _selectedDay;
-  CalendarFormat _calendarFormat = CalendarFormat.month;
+  DateTime? _selectedDay = DateTime.utc(2025, 9, 1); 
+  final CalendarFormat _calendarFormat = CalendarFormat.month; 
   PageController? _pageController;
 
-  // Variables de Rango (NECESARIAS si usaste el código de rangos, aunque no las uses)
+  // Variables de Rango 
   DateTime? _rangeStart;
   DateTime? _rangeEnd;
 
@@ -53,15 +54,17 @@ class _CalendarPageState extends State<CalendarPage> {
 
   // Manejo de la selección de un solo día
   void _onDaySelected(DateTime selectedDay, DateTime focusedDay) {
+    // Usamos isSameDay de table_calendar
     if (!isSameDay(_selectedDay, selectedDay)) {
       setState(() {
         _selectedDay = selectedDay;
-        _focusedDay = focusedDay;
-        // Reiniciamos el rango si se selecciona un solo día
+        // ✅ CORRECCIÓN CLAVE: Al seleccionar un día, forzamos que el _focusedDay
+        // sea el día seleccionado (o su mes), lo cual es el comportamiento esperado
+        // de TableCalendar para actualizar la vista correctamente.
+        _focusedDay = selectedDay; 
         _rangeStart = null;
         _rangeEnd = null;
       });
-      //print('Día seleccionado: $selectedDay');
 
       final normalizedDay = DateTime.utc(
         selectedDay.year,
@@ -71,36 +74,30 @@ class _CalendarPageState extends State<CalendarPage> {
       final String status = hostelAvailability[normalizedDay] ?? 'Disponible';
 
       if (status == 'Reservado') {
-        // Lógica de navegación:
+        // Lógica de navegación a detalles de la reserva
         Navigator.push(
           context,
           MaterialPageRoute(
-            // Debes crear una nueva pantalla, por ejemplo 'ReservationDetailsScreen'
             builder: (context) => const RoomDetailsScreen(
-              // Le pasas la fecha para que sepa qué reserva mostrar
-              //date: selectedDay,
-            ),
+                //date: selectedDay,
+                ),
           ),
         );
       } else {
-        // El status es 'Disponible'
-
-        // Lógica de navegación:
+        // Lógica de navegación a formulario de nueva reserva
         Navigator.push(
           context,
           MaterialPageRoute(
-            // Debes crear otra pantalla, por ejemplo 'NewReservationFormScreen'
             builder: (context) => const ReservationForm(
-              // Le pasas la fecha para que el formulario ya sepa qué día se va a reservar
-              //date: selectedDay,
-            ),
+                //date: selectedDay,
+                ),
           ),
         );
       }
     }
   }
 
-  // Manejo de la selección de Rango (Incluido para evitar errores con código anterior)
+  // Manejo de la selección de Rango (Implementado pero no utilizado en el UI)
   void _onRangeSelected(DateTime? start, DateTime? end, DateTime focusedDay) {
     setState(() {
       _selectedDay = null;
@@ -111,49 +108,78 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   // FUNCIÓN CLAVE: Construye la apariencia de cada día (círculos de colores)
-  Widget _buildDayContainer(DateTime day, DateTime focusedDay) {
-    final normalizedDay = day.copyWith(
-      hour: 0,
-      minute: 0,
-      second: 0,
-      millisecond: 0,
-    );
+  Widget _buildDayContainer(BuildContext context, DateTime day, DateTime focusedDay) {
+    
+    // --- Lógica de Días Fuera de Mes (Fuera de rango visible) ---
+    // ✅ Usamos la función isSameMonthLocal
+    final bool isOutside = !isSameMonthLocal(day, focusedDay); 
+
+    // Normalizar el día para buscar en el mapa de disponibilidad
+    final normalizedDay = day.copyWith(hour: 0, minute: 0, second: 0, millisecond: 0);
 
     Color backgroundColor;
     Color textColor;
+    
+    // --------------------------------------------------
+    // 1. Prioridad Máxima: DÍA SELECCIONADO (Turquesa - kPrimaryColor)
+    //    Esta lógica ahora será redundante para el selectedBuilder, pero
+    //    es necesaria para los builders default y outside.
+    // --------------------------------------------------
+    
+    // Usamos isSameDay de table_calendar
+    if (isSameDay(_selectedDay, day) ||
+        isSameDay(_rangeStart, day) ||
+        isSameDay(_rangeEnd, day)) {
+      
+      // Si está seleccionado (o es inicio/fin de rango), el color es SIEMPRE Turquesa
+      backgroundColor = kPrimaryColor; 
+      textColor = Colors.white;
 
-    // LÓGICA DE SELECCIÓN DE RANGO (Prioridad 1: Días intermedios en un rango)
-    // Nota: Desactiva el rango en TableCalendar si no lo vas a usar.
-    if (_rangeStart != null &&
+    } 
+    // --------------------------------------------------
+    // 2. Prioridad Media: DÍAS EN RANGO (Se mantiene el Turquesa, pero esto es redundante)
+    // --------------------------------------------------
+    else if (_rangeStart != null &&
         _rangeEnd != null &&
         day.isAfter(_rangeStart!) &&
         day.isBefore(_rangeEnd!)) {
+      
       backgroundColor = kPrimaryColor;
       textColor = Colors.white;
+
     }
-    // LÓGICA DE SELECCIÓN SIMPLE (Prioridad 2: Día Seleccionado o inicio/fin de rango)
-    else if (isSameDay(_selectedDay, day) ||
-        isSameDay(_rangeStart, day) ||
-        isSameDay(_rangeEnd, day)) {
-      backgroundColor = kPrimaryColor; // Verde Turquesa (Seleccionado)
-      textColor = Colors.white;
-    }
-    // LÓGICA DE ESTADOS FIJOS (Prioridad 3: Reservado / Disponible)
+    // --------------------------------------------------
+    // 3. Prioridad Baja: ESTADOS FIJOS (Reservado/Disponible)
+    // --------------------------------------------------
     else {
       final String status = hostelAvailability[normalizedDay] ?? 'Disponible';
       backgroundColor = statusColors[status] ?? kAvailableColor;
       textColor = (status == 'Disponible') ? Colors.grey : Colors.white;
     }
+    
+    // --------------------------------------------------
+    // 4. LÓGICA DE OPACIDAD (Se aplica al color ya determinado)
+    // --------------------------------------------------
+    // SOLO aplicamos opacidad si es fuera de mes Y no es el día seleccionado.
+    if (isOutside && !isSameDay(_selectedDay, day)) {
+        // Reducimos la opacidad si es un día fuera del mes Y NO ES EL DÍA SELECCIONADO
+        backgroundColor = backgroundColor.withOpacity(0.5);
+        textColor = Colors.grey.withOpacity(0.5); 
+    }
+
+    // 🌟 TAMAÑO DE FUENTE FIJO
+    const double fixedFontSize = 14.0; 
 
     // Contenedor circular
     return Container(
-      margin: const EdgeInsets.all(5.0),
+      margin: const EdgeInsets.all(5.0), 
       decoration: BoxDecoration(
         color: backgroundColor,
         shape: BoxShape.circle,
-        // Borde para el día de hoy
-        border: isSameDay(day, DateTime.now()) && _selectedDay == null
-            ? Border.all(color: kPrimaryColor.withOpacity(0.5), width: 1.5)
+        // Borde para el día de hoy (solo si no está seleccionado y no es un día fuera del mes)
+        // Usamos isSameDay de table_calendar
+        border: isSameDay(day, DateTime.now()) && !isSameDay(_selectedDay, day) && !isOutside
+            ? Border.all(color: kPrimaryColor.withOpacity(0.7), width: 1.5)
             : null,
       ),
       alignment: Alignment.center,
@@ -162,28 +188,71 @@ class _CalendarPageState extends State<CalendarPage> {
         style: TextStyle(
           color: textColor,
           fontWeight: FontWeight.w600,
-          fontSize: 14,
+          // 🔥 USO DE TAMAÑO FIJO
+          fontSize: fixedFontSize, 
         ),
       ),
     );
   }
+  
+  // ✅ NUEVA FUNCIÓN: Constructor dedicado para el día seleccionado (garantiza el color Turquesa)
+  Widget _buildSelectedDayContainer(BuildContext context, DateTime day, DateTime focusedDay) {
+      // El día seleccionado siempre debe ser Turquesa y el texto blanco
+      Color backgroundColor = kPrimaryColor;
+      Color textColor = Colors.white;
+      
+      // La opacidad solo se aplica al texto si está fuera del mes, pero mantenemos el fondo fuerte
+      final bool isOutside = !isSameMonthLocal(day, focusedDay); 
+      Color finalTextColor = isOutside ? Colors.white.withOpacity(0.7) : Colors.white;
+      
+      const double fixedFontSize = 14.0; 
+
+      // Contenedor circular con el color Turquesa asegurado
+      return Container(
+          margin: const EdgeInsets.all(5.0), 
+          decoration: BoxDecoration(
+            color: backgroundColor, // KPrimaryColor (Turquesa)
+            shape: BoxShape.circle,
+            border: isSameDay(day, DateTime.now())
+                ? Border.all(color: Colors.white, width: 2.0)
+                : null,
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            '${day.day}',
+            style: TextStyle(
+              color: finalTextColor, 
+              fontWeight: FontWeight.w700,
+              fontSize: fixedFontSize, 
+            ),
+          ),
+        );
+    }
 
   // 3. WIDGET BUILD (VISTA)
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(
+      backgroundColor: const Color.fromARGB(
         255,
         255,
         255,
         255,
-      ), // Fondo ligero del diseño
+      ), 
       appBar: AppBar(
         backgroundColor: Colors.white,
         scrolledUnderElevation: 0.0,
-        toolbarHeight: 80.0,
         elevation: 0,
-        leading: const BackButton(color: kPrimaryColor),
+        // Reemplazamos BackButton por un IconButton con la misma funcionalidad
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: kPrimaryColor,
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
         title: Text(
           'Habitación doble',
           style: GoogleFonts.poppins(
@@ -201,13 +270,15 @@ class _CalendarPageState extends State<CalendarPage> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12.0),
                 child: Container(
-                  height: 150,
+                  height: 100,
                   width: double.infinity,
                   color: Colors.grey[300],
                   child: Image.network(
-                    'https://res.cloudinary.com/dfznn7pui/image/upload/v1760068145/pop_9_ilwxua.png', // REEMPLAZA CON EL NOMBRE REAL DE TU ARCHIVO
-                    fit: BoxFit
-                        .cover, // Para que la imagen cubra todo el espacio
+                    'https://res.cloudinary.com/dfznn7pui/image/upload/v1760068145/pop_9_ilwxua.png', 
+                    fit: BoxFit.cover, 
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Center(child: Text("Error al cargar imagen"));
+                    },
                   ),
                 ),
               ),
@@ -216,8 +287,8 @@ class _CalendarPageState extends State<CalendarPage> {
             // Título del Mes (Septiembre) y flechas
             Padding(
               padding: const EdgeInsets.only(
-                left: 16.0,
-                right: 16.0,
+                left: 30.0,
+                right: 30.0,
                 bottom: 8.0,
               ),
               child: Row(
@@ -225,15 +296,15 @@ class _CalendarPageState extends State<CalendarPage> {
                 children: [
                   Text(
                     DateFormat.MMMM('es').format(_focusedDay).capitalize(),
-                    style: TextStyle(
-                      fontSize: 24.0,
+                    style: const TextStyle(
+                      fontSize: 18.0,
                       fontWeight: FontWeight.bold,
                       color: kPrimaryColor,
                     ),
                   ),
                   Row(
                     children: [
-                      // Flechas de navegación (funcionalidad no implementada)
+                      // Flechas de navegación
                       IconButton(
                         icon: const Icon(
                           Icons.arrow_back_ios,
@@ -268,8 +339,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
             // El Widget principal del Calendario (AÑADIMOS EL PADDING AQUÍ)
             Padding(
-              // 🔥 MODIFICACIÓN CLAVE: Padding horizontal para el calendario
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 30.0),
               child: TableCalendar(
                 onCalendarCreated: (PageController controller) {
                   _pageController = controller;
@@ -286,32 +356,40 @@ class _CalendarPageState extends State<CalendarPage> {
                   weekdayStyle: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.grey,
+                    fontSize: 12,
                   ),
                   weekendStyle: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.grey,
+                    fontSize: 12,
                   ),
                 ),
 
+                // Se elimina calendarStyle.selectedDecoration para que 
+                // TableCalendar no aplique su propia decoración animada.
+                // La decoración del día seleccionado se maneja completamente en _buildDayContainer.
                 calendarStyle: const CalendarStyle(
                   isTodayHighlighted: false,
                   outsideDaysVisible: true,
-                  selectedDecoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color.fromRGBO(26, 188, 156, 1),
-                  ),
                 ),
 
                 calendarBuilders: CalendarBuilders(
-                  defaultBuilder: (context, day, focusedDay) {
-                    return _buildDayContainer(day, focusedDay);
+                  // ✅ NUEVO BUILDER: Garantiza el estilo del día seleccionado (máxima prioridad)
+                  selectedBuilder: (context, day, focusedDay) {
+                    return _buildSelectedDayContainer(context, day, focusedDay);
                   },
+                  // Usa el mismo builder para todos los días visibles (incluyendo default)
+                  defaultBuilder: (context, day, focusedDay) {
+                    return _buildDayContainer(context, day, focusedDay);
+                  },
+                  // Usa el mismo builder para los días de otros meses
                   outsideBuilder: (context, day, focusedDay) {
-                    return _buildDayContainer(day, focusedDay);
+                    return _buildDayContainer(context, day, focusedDay);
                   },
                 ),
 
                 onDaySelected: _onDaySelected,
+                // Usamos isSameDay de table_calendar
                 selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
                 onPageChanged: (focusedDay) {
                   setState(() {
@@ -328,13 +406,13 @@ class _CalendarPageState extends State<CalendarPage> {
               padding: const EdgeInsets.only(
                 left: 16.0,
                 right: 16.0,
-                top: 10.0,
-                bottom: 40.0,
+                top: 5.0,
+                bottom: 20.0,
               ),
               child: Wrap(
                 spacing: 16.0,
-                runSpacing: 8.0, // Espacio vertical entre líneas si hace wrap
-                alignment: WrapAlignment.center, // Centra los ítems
+                runSpacing: 8.0, 
+                alignment: WrapAlignment.center, 
 
                 children: [
                   _buildLegendItem(kPrimaryColor, 'Seleccionado'),
@@ -357,6 +435,16 @@ class _CalendarPageState extends State<CalendarPage> {
 }
 
 // FUNCIONES AUXILIARES (DEBEN IR FUERA DE LA CLASE _CalendarPageState)
+
+// SOLUCIÓN AL ERROR: Implementación local de isSameMonth
+bool isSameMonthLocal(DateTime? a, DateTime? b) {
+  if (a == null || b == null) {
+    return false;
+  }
+  return a.year == b.year && a.month == b.month;
+}
+
+
 // Función auxiliar para construir los ítems de la leyenda
 Widget _buildLegendItem(Color color, String text) {
   return Row(
@@ -370,13 +458,10 @@ Widget _buildLegendItem(Color color, String text) {
       const SizedBox(width: 5),
       Text(
         text,
-        // 🔥 MODIFICACIÓN CLAVE: Cambiar color y tamaño de fuente aquí
         style: const TextStyle(
-          fontSize: 12, // <-- Aumentar el tamaño a 16 (puedes ajustar)
-          color:
-              Colors.grey, // <-- Cambiar a color negro (o el color que desees)
-          fontWeight:
-              FontWeight.normal, // Opcional: Define el peso de la fuente
+          fontSize: 12, 
+          color: Colors.grey, 
+          fontWeight: FontWeight.normal,
         ),
       ),
     ],

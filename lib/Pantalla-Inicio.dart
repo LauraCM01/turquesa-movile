@@ -44,11 +44,29 @@ final List<Room> dummyRooms = [
   ),
 ];
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  String _searchQuery = '';
+  List<Room> _filteredRooms = dummyRooms;
 
   void _addRoom(BuildContext context) {
     debugPrint('Botón "Agregar Habitación" presionado.');
+  }
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      _searchQuery = query;
+      _filteredRooms = dummyRooms
+          .where((room) =>
+              room.name.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
   }
 
   @override
@@ -113,20 +131,30 @@ class HomeScreen extends StatelessWidget {
               _buildSearchBar(),
               const SizedBox(height: 20),
               Expanded(
-                child: GridView.count(
-                  padding: const EdgeInsets.only(
-                    top: 0.0,
-                    left: 16.0,
-                    right: 16.0,
-                    bottom: 10.0,
-                  ),
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 16.0,
-                  mainAxisSpacing: 16.0,
-                  children: dummyRooms.map((room) {
-                    return RoomCard(room: room);
-                  }).toList(),
-                ),
+                child: _filteredRooms.isEmpty
+                    ? Center(
+                        child: Text(
+                          'No se encontraron resultados',
+                          style: GoogleFonts.poppins(
+                            fontSize: 18,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      )
+                    : GridView.count(
+                        padding: const EdgeInsets.only(
+                          top: 0.0,
+                          left: 16.0,
+                          right: 16.0,
+                          bottom: 10.0,
+                        ),
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 16.0,
+                        mainAxisSpacing: 16.0,
+                        children: _filteredRooms.map((room) {
+                          return RoomCard(room: room);
+                        }).toList(),
+                      ),
               ),
               const SizedBox(height: 20),
               ElevatedButton.icon(
@@ -172,6 +200,7 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       child: TextField(
+        onChanged: _onSearchChanged,
         decoration: InputDecoration(
           hintText: 'Buscador',
           hintStyle: GoogleFonts.poppins(color: Colors.grey),
@@ -184,7 +213,7 @@ class HomeScreen extends StatelessWidget {
             right: 0.0,
           ),
         ),
-        style: GoogleFonts.poppins(fontSize: 16),
+        style: GoogleFonts.poppins(fontSize: 16, color: Colors.grey),
       ),
     );
   }
