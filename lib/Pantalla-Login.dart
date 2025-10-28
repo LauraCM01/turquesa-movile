@@ -209,10 +209,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   onPressed: () {
-                    // Ahora puedes acceder al texto de los campos usando los controladores.
-                    // final username = _usernameController.text;
-                    // final password = _passwordController.text;
-                    // print('Usuario: $username, Contraseña: $password');
                     Navigator.push(
                       context,
                       MaterialPageRoute(
