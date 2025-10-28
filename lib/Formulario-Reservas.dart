@@ -265,7 +265,7 @@ class _ReservationFormState extends State<ReservationForm> {
                         const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
                 _buildTextField(
                   context: context,
                   controller: _personsController,
@@ -279,7 +279,7 @@ class _ReservationFormState extends State<ReservationForm> {
                         const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
                 _buildDateField(
                   context: context,
                   controller: _arrivalDateController,
@@ -294,7 +294,7 @@ class _ReservationFormState extends State<ReservationForm> {
                         const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
                 _buildDateField(
                   context: context,
                   controller: _departureDateController,
@@ -309,7 +309,7 @@ class _ReservationFormState extends State<ReservationForm> {
                         const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
                 _buildTextField(
                   context: context,
                   controller: _phoneController,
@@ -323,7 +323,7 @@ class _ReservationFormState extends State<ReservationForm> {
                         const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 16),
                 _buildTextField(
                   context: context,
                   controller: _reservationNumberController,
@@ -337,7 +337,7 @@ class _ReservationFormState extends State<ReservationForm> {
                         const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 30),
                 Center(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(

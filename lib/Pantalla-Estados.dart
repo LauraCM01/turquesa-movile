@@ -5,21 +5,9 @@ import 'package:myapp/providers/room_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:myapp/widgets/Barra-Navegacion.dart';
 
-class RoomDetailsScreen extends StatefulWidget {
+class RoomDetailsScreen extends StatelessWidget {
   const RoomDetailsScreen({super.key});
 
-  @override
-  State<RoomDetailsScreen> createState() => _RoomDetailsScreenState();
-}
-
-class _RoomDetailsScreenState extends State<RoomDetailsScreen> {
-
-  int _selectedIndex = 1;
-void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   // 2. WIDGET BUILD (VISTA)
   @override
@@ -165,9 +153,8 @@ void _onItemTapped(int index) {
       ),
 
       // 🔥 3. AGREGAR BARRA DE NAVEGACIÓN
-      bottomNavigationBar: BarraNavegacion(
-        selectedIndex: _selectedIndex,
-        onItemTapped: _onItemTapped,
+      bottomNavigationBar: const BarraNavegacion(
+        selectedIndex: 1,
       ),
     );
   }

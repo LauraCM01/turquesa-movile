@@ -45,13 +45,6 @@ class _CalendarPageState extends State<CalendarPage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   PageController? _pageController;
 
-  int _selectedIndex = 0;
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   // Variables de Rango (NECESARIAS si usaste el código de rangos, aunque no las uses)
   DateTime? _rangeStart;
   DateTime? _rangeEnd;
@@ -83,7 +76,7 @@ class _CalendarPageState extends State<CalendarPage> {
           context,
           MaterialPageRoute(
             // Debes crear una nueva pantalla, por ejemplo 'ReservationDetailsScreen'
-            builder: (context) => RoomDetailsScreen(
+            builder: (context) => const RoomDetailsScreen(
               // Le pasas la fecha para que sepa qué reserva mostrar
               //date: selectedDay,
             ),
@@ -97,7 +90,7 @@ class _CalendarPageState extends State<CalendarPage> {
           context,
           MaterialPageRoute(
             // Debes crear otra pantalla, por ejemplo 'NewReservationFormScreen'
-            builder: (context) => ReservationForm(
+            builder: (context) => const ReservationForm(
               // Le pasas la fecha para que el formulario ya sepa qué día se va a reservar
               //date: selectedDay,
             ),
@@ -186,7 +179,9 @@ class _CalendarPageState extends State<CalendarPage> {
         255,
       ), // Fondo ligero del diseño
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 255, 255, 255),
+        backgroundColor: Colors.white,
+        scrolledUnderElevation: 0.0,
+        toolbarHeight: 80.0,
         elevation: 0,
         leading: const BackButton(color: kPrimaryColor),
         title: Text(
@@ -196,7 +191,6 @@ class _CalendarPageState extends State<CalendarPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -356,11 +350,8 @@ class _CalendarPageState extends State<CalendarPage> {
           ],
         ),
       ),
-      
-      bottomNavigationBar: BarraNavegacion(
-        selectedIndex: _selectedIndex,
-        onItemTapped: _onItemTapped,
-      ),
+
+      bottomNavigationBar: const BarraNavegacion(selectedIndex: 1),
     );
   }
 }

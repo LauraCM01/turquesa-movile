@@ -92,18 +92,21 @@ class _LoginPageState extends State<LoginPage> {
 
                 // Icono usuario.
                 Padding(
-                  // Aplica 20.0 de margen en la parte superior (top)
-                  // y 20.0 a la izquierda y derecha (left, right).
-                  // La parte inferior (bottom) se queda en 0.0.
-                  padding: const EdgeInsets.only(
-                    top: 40.0,
-                    bottom: 0.0, // O simplemente omites el 'bottom' ya que por defecto es 0.0
-                  ),
+                  padding: const EdgeInsets.only(top: 30.0, bottom: 0.0),
                   child: const CircleAvatar(
-                    // Tamaño reducido
-                    radius: 50,
-                    backgroundColor: Color(0XFF2CB7A6),
-                    child: Icon(Icons.person, size: 50, color: Colors.white),
+                    // 💡 CAMBIO 1: Ajusta el radio para el tamaño del círculo
+                    radius: 50, // Un poco más pequeño para que haya más "aire"
+                    // 💡 CAMBIO 2: Usa el color con opacidad que parece en la imagen
+                    backgroundColor: Color(
+                      0x1A2CB7A6,
+                    ), // Este es el verde claro
+                    child: Icon(
+                      Icons.person,
+                      // 💡 CAMBIO 3: Ajusta el tamaño del ícono
+                      size: 60, // Más pequeño para que no toque los bordes
+                      // 💡 CAMBIO 4: El color del ícono es el verde principal
+                      color: Color(0XFF2CB7A6),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20.0),
@@ -111,13 +114,17 @@ class _LoginPageState extends State<LoginPage> {
                 // Campo de texto para el nombre de usuario (Username).
                 TextFormField(
                   controller: _usernameController, // Asocia el controlador.
-                  style: GoogleFonts.poppins(fontSize: 16.0, color: Colors.grey),
+                  style: GoogleFonts.poppins(
+                    fontSize: 16.0,
+                    color: Colors.grey,
+                  ),
                   decoration: InputDecoration(
                     prefixIcon: const Icon(
                       Icons.person_outline,
                       color: Colors.grey,
                     ),
                     hintText: 'Usuario',
+                    hintStyle: GoogleFonts.poppins(color: Colors.grey),
                     contentPadding: const EdgeInsets.fromLTRB(
                       20.0,
                       15.0,
@@ -149,13 +156,17 @@ class _LoginPageState extends State<LoginPage> {
                 TextFormField(
                   controller: _passwordController, // Asocia el controlador.
                   obscureText: true, // Oculta el texto.
-                  style: GoogleFonts.poppins(fontSize: 16.0, color: Colors.grey),
+                  style: GoogleFonts.poppins(
+                    fontSize: 16.0,
+                    color: Colors.grey,
+                  ),
                   decoration: InputDecoration(
                     prefixIcon: const Icon(
                       Icons.lock_outline,
                       color: Colors.grey,
                     ),
                     hintText: 'Contraseña',
+                    hintStyle: GoogleFonts.poppins(color: Colors.grey),
                     contentPadding: const EdgeInsets.fromLTRB(
                       20.0,
                       15.0,
@@ -236,7 +247,7 @@ class _LoginPageState extends State<LoginPage> {
                           style: GoogleFonts.poppins(
                             fontSize: 14.0,
                             color: Colors.grey,
-                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -260,7 +271,7 @@ class _LoginPageState extends State<LoginPage> {
                       style: GoogleFonts.poppins(
                         fontSize: 14.0,
                         color: Colors.grey,
-                        ),
+                      ),
                     ),
                     const SizedBox(height: 16.0),
                     ElevatedButton(
@@ -301,7 +312,10 @@ class _LoginPageState extends State<LoginPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Text(
                         "O",
-                        style: GoogleFonts.poppins(color: Colors.grey, fontSize: 16),
+                        style: GoogleFonts.poppins(
+                          color: Colors.grey,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                     Expanded(child: Divider(color: Colors.grey)),
