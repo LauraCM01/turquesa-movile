@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'Pantalla-Inicio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class PantallaRegistro extends StatefulWidget {
   const PantallaRegistro({super.key});
@@ -27,6 +28,34 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
     super.dispose();
   }
 
+  Future<void> _submitForm() async {
+    try {
+      final credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: _correoController.text,
+            password: _contrasenaController.text,
+          );
+      guardarDatosFormulario(credential);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        print('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        print('The account already exists for that email.');
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> guardarDatosFormulario(credential) async {
+    // guardar en firebase los datos del usuario
+
+    // se va para la pantalla de inicio
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const HomeScreen()));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,49 +78,54 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-
-                // Logo de la marca.
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      // Define el ancho y alto deseado para tu logo.
-                      width: 200, // Ejemplo de ancho
-                      child: Image.network(
-                        // ¡TODO: Reemplaza esta URL de ejemplo con la URL real de tu logo!
-                        'https://res.cloudinary.com/dfznn7pui/image/upload/v1761514333/LOGO-HOSTAL_yvkmmi.png',
-                        fit: BoxFit
-                            .contain, // Ajusta cómo se muestra la imagen dentro del SizedBox
-                        loadingBuilder:
-                            (
-                              BuildContext context,
-                              Widget child,
-                              ImageChunkEvent? loadingProgress,
-                            ) {
-                              if (loadingProgress == null) return child;
-                              return Center(
-                                child: CircularProgressIndicator(
-                                  value:
-                                      loadingProgress.expectedTotalBytes != null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                            loadingProgress.expectedTotalBytes!
-                                      : null,
-                                ),
-                              );
-                            },
-                        errorBuilder:
-                            (
-                              BuildContext context,
-                              Object exception,
-                              StackTrace? stackTrace,
-                            ) {
-                              // Widget a mostrar si la imagen no se puede cargar (por ejemplo, un ícono o texto de error)
-                              return const Icon(Icons.error, color: Colors.red);
-                            },
+                  // Logo de la marca.
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        // Define el ancho y alto deseado para tu logo.
+                        width: 200, // Ejemplo de ancho
+                        child: Image.network(
+                          // ¡TODO: Reemplaza esta URL de ejemplo con la URL real de tu logo!
+                          'https://res.cloudinary.com/dfznn7pui/image/upload/v1761514333/LOGO-HOSTAL_yvkmmi.png',
+                          fit: BoxFit
+                              .contain, // Ajusta cómo se muestra la imagen dentro del SizedBox
+                          loadingBuilder:
+                              (
+                                BuildContext context,
+                                Widget child,
+                                ImageChunkEvent? loadingProgress,
+                              ) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value:
+                                        loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                  .cumulativeBytesLoaded /
+                                              loadingProgress
+                                                  .expectedTotalBytes!
+                                        : null,
+                                  ),
+                                );
+                              },
+                          errorBuilder:
+                              (
+                                BuildContext context,
+                                Object exception,
+                                StackTrace? stackTrace,
+                              ) {
+                                // Widget a mostrar si la imagen no se puede cargar (por ejemplo, un ícono o texto de error)
+                                return const Icon(
+                                  Icons.error,
+                                  color: Colors.red,
+                                );
+                              },
+                        ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
 
                   const SizedBox(height: 40),
                   _buildTextFormField(
@@ -131,9 +165,7 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => const HomeScreen()),
-                        );
+                        _submitForm();
                       }
                     },
                     child: Text(
@@ -151,7 +183,10 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
                     children: [
                       Text(
                         'Ya tienes una cuenta?',
-                        style: GoogleFonts.poppins(color: Colors.grey, fontSize: 16),
+                        style: GoogleFonts.poppins(
+                          color: Colors.grey,
+                          fontSize: 16,
+                        ),
                       ),
                       TextButton(
                         onPressed: () {
