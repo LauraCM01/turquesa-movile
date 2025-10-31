@@ -52,12 +52,12 @@ class ChatScreenState extends State<ChatScreen> {
         backgroundColor: const Color(0xFFE0F2F1),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF00796B)),
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF2CB7A6)),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
-          'Administrador',
-          style: TextStyle(color: Color(0xFF00796B), fontWeight: FontWeight.bold),
+          'Chat',
+          style: TextStyle(color: Color(0xFF2CB7A6), fontWeight: FontWeight.bold),
         ),
       ),
       body: Column(
@@ -92,7 +92,7 @@ class ChatScreenState extends State<ChatScreen> {
                 const SizedBox(width: 8.0),
                 FloatingActionButton(
                   onPressed: () => _handleSubmitted(_textController.text),
-                  backgroundColor: const Color(0xFF00796B),
+                  backgroundColor: const Color(0xFF2CB7A6),
                   child: const Icon(Icons.send, color: Colors.white),
                 ),
               ],
