@@ -1,7 +1,9 @@
+// 🟢 pantalla_registro.dart
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'Pantalla-Inicio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:myapp/Pantalla-Inicio.dart';
 
 class PantallaRegistro extends StatefulWidget {
   const PantallaRegistro({super.key});
@@ -17,6 +19,9 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
   final _cedulaController = TextEditingController();
   final _correoController = TextEditingController();
   final _contrasenaController = TextEditingController();
+  final db = FirebaseFirestore.instance;
+
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -29,31 +34,77 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
   }
 
   Future<void> _submitForm() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
     try {
       final credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
-            email: _correoController.text,
-            password: _contrasenaController.text,
+            email: _correoController.text.trim(),
+            password: _contrasenaController.text.trim(),
           );
-      guardarDatosFormulario(credential);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
+
+      await guardarDatosFormulario(credential);
+
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Registro exitoso 🎉')));
       }
+    } on FirebaseAuthException catch (e) {
+      String mensaje = 'Error desconocido';
+      if (e.code == 'weak-password') {
+        mensaje = 'La contraseña es demasiado débil.';
+      } else if (e.code == 'email-already-in-use') {
+        mensaje = 'El correo ya está registrado.';
+      } else if (e.code == 'invalid-email') {
+        mensaje = 'El correo no es válido.';
+      }
+
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(mensaje)));
     } catch (e) {
       print(e);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
-  Future<void> guardarDatosFormulario(credential) async {
-    // guardar en firebase los datos del usuario
+  Future<void> guardarDatosFormulario(UserCredential credential) async {
+    final user = credential.user;
+    if (user == null) {
+      print("Error: El usuario es nulo después del registro.");
+      return;
+    }
 
-    // se va para la pantalla de inicio
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (context) => const HomeScreen()));
+    final userData = {
+      "nombre": _nombreController.text.trim(),
+      "apellido": _apellidoController.text.trim(),
+      "cedula": _cedulaController.text.trim(),
+      "correo": _correoController.text.trim(),
+      "fecha_registro": FieldValue.serverTimestamp(),
+    };
+
+    try {
+      await db.collection("usuarios").doc(user.uid).set(userData);
+      print('Usuario guardado en Firestore con UID: ${user.uid}');
+
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const HomeScreen()),
+        );
+      }
+    } catch (e) {
+      print('Error al guardar en Firestore: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al guardar datos en Firestore')),
+      );
+    }
   }
 
   @override
@@ -78,50 +129,30 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  // Logo de la marca.
+                  // Logo
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(
-                        // Define el ancho y alto deseado para tu logo.
-                        width: 200, // Ejemplo de ancho
+                        width: 200,
                         child: Image.network(
-                          // ¡TODO: Reemplaza esta URL de ejemplo con la URL real de tu logo!
                           'https://res.cloudinary.com/dfznn7pui/image/upload/v1761514333/LOGO-HOSTAL_yvkmmi.png',
-                          fit: BoxFit
-                              .contain, // Ajusta cómo se muestra la imagen dentro del SizedBox
-                          loadingBuilder:
-                              (
-                                BuildContext context,
-                                Widget child,
-                                ImageChunkEvent? loadingProgress,
-                              ) {
-                                if (loadingProgress == null) return child;
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    value:
-                                        loadingProgress.expectedTotalBytes !=
-                                            null
-                                        ? loadingProgress
-                                                  .cumulativeBytesLoaded /
-                                              loadingProgress
-                                                  .expectedTotalBytes!
-                                        : null,
-                                  ),
-                                );
-                              },
-                          errorBuilder:
-                              (
-                                BuildContext context,
-                                Object exception,
-                                StackTrace? stackTrace,
-                              ) {
-                                // Widget a mostrar si la imagen no se puede cargar (por ejemplo, un ícono o texto de error)
-                                return const Icon(
-                                  Icons.error,
-                                  color: Colors.red,
-                                );
-                              },
+                          fit: BoxFit.contain,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                value:
+                                    loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, exception, stackTrace) {
+                            return const Icon(Icons.error, color: Colors.red);
+                          },
                         ),
                       ),
                     ],
@@ -131,70 +162,73 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
                   _buildTextFormField(
                     controller: _nombreController,
                     hintText: 'Nombre',
+                    textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 20),
                   _buildTextFormField(
                     controller: _apellidoController,
                     hintText: 'Apellido',
+                    textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 20),
                   _buildTextFormField(
                     controller: _cedulaController,
-                    hintText: 'Cedula',
+                    hintText: 'Cédula',
+                    keyboardType: TextInputType.number,
+                    textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 20),
                   _buildTextFormField(
                     controller: _correoController,
                     hintText: 'Correo',
                     keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 20),
                   _buildTextFormField(
                     controller: _contrasenaController,
                     hintText: 'Contraseña',
                     obscureText: true,
+                    textInputAction: TextInputAction.done,
                   ),
                   const SizedBox(height: 40),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0XFF2CB7A6),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        _submitForm();
-                      }
-                    },
-                    child: Text(
-                      'INGRESAR',
-                      style: GoogleFonts.poppins(
-                        fontSize: 18,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0XFF2CB7A6),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          onPressed: _submitForm,
+                          child: Text(
+                            'REGISTRAR',
+                            style: GoogleFonts.poppins(
+                              fontSize: 18,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+
                   const SizedBox(height: 20),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Ya tienes una cuenta?',
+                        '¿Ya tienes una cuenta?',
                         style: GoogleFonts.poppins(
                           color: Colors.grey,
                           fontSize: 16,
                         ),
                       ),
                       TextButton(
-                        onPressed: () {
-                          // Navegar a la pantalla de login
-                          Navigator.of(context).pop();
-                        },
+                        onPressed: () => Navigator.of(context).pop(),
                         child: Text(
-                          'Volver',
+                          'Inicia sesión',
                           style: GoogleFonts.poppins(
                             color: const Color(0xFF26A69A),
                             fontSize: 16,
@@ -218,11 +252,13 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
     required String hintText,
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
+    TextInputAction textInputAction = TextInputAction.next,
   }) {
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
+      textInputAction: textInputAction,
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Este campo es obligatorio';
@@ -230,6 +266,9 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
         if (hintText == 'Correo' &&
             !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
           return 'Por favor, introduce un correo válido';
+        }
+        if (hintText == 'Contraseña' && value.length < 6) {
+          return 'La contraseña debe tener al menos 6 caracteres';
         }
         return null;
       },

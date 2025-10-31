@@ -79,8 +79,8 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               _buildDateField(
-                label: 'Fecha de nacimiento',
-                value: '28/06/1983',
+                label: 'Cédula',
+                value: '1001456728',
               ),
               const SizedBox(height: 20),
               ElevatedButton(
