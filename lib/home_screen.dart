@@ -1,55 +1,36 @@
-
 import 'package:flutter/material.dart';
 import 'package:myapp/chat_message.dart';
 import 'package:myapp/message_buble.dart';
 
-class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  ChatScreenState createState() => ChatScreenState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class ChatScreenState extends State<ChatScreen> {
+class _HomePageState extends State<HomePage> {
   final TextEditingController _textController = TextEditingController();
   final List<ChatMessage> _messages = [
-    const ChatMessage(
-      message: 'Hola, ¿cómo estás?',
-      isMe: true,
-    ),
-    const ChatMessage(
-      message: '¡Hola! Estoy bien, ¿y tú?',
-      isMe: false,
-    ),
-    const ChatMessage(
-      message: 'Necesito ayuda con mi cuenta.',
-      isMe: true,
-    ),
-    const ChatMessage(
-      message: 'Claro, ¿cuál es el problema?',
-      isMe: false,
-    ),
+    const ChatMessage(message: 'Hola, ¿cómo estás?', isMe: true),
+    const ChatMessage(message: '¡Hola! Estoy bien, ¿y tú?', isMe: false),
+    const ChatMessage(message: 'Necesito ayuda con mi cuenta.', isMe: true),
+    const ChatMessage(message: 'Claro, ¿cuál es el problema?', isMe: false),
   ];
 
   void _handleSubmitted(String text) {
     _textController.clear();
     setState(() {
-      _messages.insert(
-        0,
-        ChatMessage(
-          message: text,
-          isMe: true,
-        ),
-      );
+      _messages.insert(0, ChatMessage(message: text, isMe: true));
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE0F2F1),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFE0F2F1),
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0xFF2CB7A6)),
@@ -57,7 +38,10 @@ class ChatScreenState extends State<ChatScreen> {
         ),
         title: const Text(
           'Chat',
-          style: TextStyle(color: Color(0xFF2CB7A6), fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Color(0xFF2CB7A6),
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
       body: Column(
