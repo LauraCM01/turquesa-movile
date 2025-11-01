@@ -12,7 +12,7 @@ class RoomCard extends StatelessWidget {
     return AspectRatio(
       aspectRatio: 1.0,
       child: Card(
-        color: Colors.white, 
+        color: Colors.white,
         clipBehavior: Clip.antiAlias,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         elevation: 4,
@@ -65,7 +65,7 @@ class RoomCard extends StatelessWidget {
                       onPressed: () {
                         Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (context) => CalendarPage(),
+                            builder: (context) => CalendarPage(room: room),
                           ),
                         );
                       },
