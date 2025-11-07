@@ -1,48 +1,67 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
-class Calendarioservice {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+class CalendarioService {
+  final String baseUrl = "https://hostalsanrosa-production.up.railway.app/api";
 
-  Future<void> guardarRangoFechas({
-    required DateTime fechaInicio,
-    required DateTime fechaFin,
-    required String habitacionId,
-    required String estado,
-  }) async {
-    try {
-      await _firestore.collection('calendario').add({
-        'fecha_inicio': Timestamp.fromDate(fechaInicio),
-        'fecha_fin': Timestamp.fromDate(fechaFin),
-        'habitacionId': habitacionId,
-        'estado': estado,
-        'fecha_creacion': FieldValue.serverTimestamp(),
-      });
-      print('Rango de fechas guardado exitosamente.');
-    } catch (e) {
-      print('Error al guardar el rango de fechas: $e');
-      // Re-throw the exception to be handled by the UI
-      throw e;
+  /// Obtiene el token de acceso
+  Future<String?> obtenerToken() async {
+    final url = Uri.parse("$baseUrl/token/");
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        "username": "sanrosa",
+        "password": "termalessantarosadecabal",
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data["access"];
+    } else {
+      print("Error al obtener token: ${response.body}");
+      return null;
     }
   }
 
-  // Method to get events for a given room, ordered by start date
-  Stream<QuerySnapshot> getEventosPorHabitacion(String habitacionId) {
-    return _firestore
-        .collection('calendario')
-        .where('habitacionId', isEqualTo: habitacionId)
-        .orderBy('fecha_inicio')
-        .snapshots();
-  }
+  /// Obtiene la disponibilidad de la habitación entre fechas dinámicas
+  Future<Map<DateTime, String>> obtenerDisponibilidad(int habitacionId) async {
+    final token = await obtenerToken();
+    if (token == null) return {};
 
+    final now = DateTime.now();
+    final fechaInicio = DateFormat('yyyy-MM-dd').format(now.subtract(const Duration(days: 10)));
+    final fechaFin = DateFormat('yyyy-MM-dd').format(DateTime(now.year, now.month + 3, now.day));
 
-  // Method to get a specific event by its document ID
-  Future<DocumentSnapshot> getEventoPorId(String eventoId) async {
-    try {
-      DocumentSnapshot doc = await _firestore.collection('calendario').doc(eventoId).get();
-      return doc;
-    } catch (e) {
-      print('Error al obtener el evento por ID: $e');
-      rethrow;
+    final url = Uri.parse(
+      "$baseUrl/calendario/habitacion/$habitacionId/?fecha_inicio=$fechaInicio&fecha_fin=$fechaFin",
+    );
+
+    final response = await http.get(
+      url,
+      headers: {
+        'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final disponibilidad = data['disponibilidad'] as List;
+      final Map<DateTime, String> mapa = {};
+
+      for (var item in disponibilidad) {
+        final fecha = DateTime.parse(item['fecha']);
+        final disponible = item['disponible'];
+        mapa[DateTime.utc(fecha.year, fecha.month, fecha.day)] =
+            disponible ? 'Disponible' : 'Reservado';
+      }
+
+      return mapa;
+    } else {
+      print("Error al obtener disponibilidad: ${response.body}");
+      return {};
     }
   }
 }

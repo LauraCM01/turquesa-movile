@@ -1,48 +1,10 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:myapp/models/room.dart';
 import 'widgets/Barra-Navegacion.dart';
 import 'widgets/room_card.dart';
-
-// Lista de habitaciones simuladas (sin const en los objetos Room)
-final List<Room> dummyRooms = [
-  Room(
-    name: 'Habitación Familiar',
-    imageUrl:
-        'https://res.cloudinary.com/dfznn7pui/image/upload/v1760064533/habitacion_9_mhcbqn.png',
-    id: 'R001',
-  ),
-  Room(
-    name: 'Habitación Doble',
-    imageUrl:
-        'https://res.cloudinary.com/dfznn7pui/image/upload/v1760066812/habitacion_11_b4afjs.png',
-    id: 'R002',
-  ),
-  Room(
-    name: 'Habitación Triple',
-    imageUrl:
-        'https://res.cloudinary.com/dfznn7pui/image/upload/v1760064533/habitacion_9_mhcbqn.png',
-    id: 'R003',
-  ),
-  Room(
-    name: 'Habitación Suite',
-    imageUrl:
-        'https://res.cloudinary.com/dfznn7pui/image/upload/v1760064532/habitacion_3_tyjjyj.png',
-    id: 'R004',
-  ),
-  Room(
-    name: 'Habitación Familiar',
-    imageUrl:
-        'https://res.cloudinary.com/dfznn7pui/image/upload/v1760064532/habitacion_3_tyjjyj.png',
-    id: 'R005',
-  ),
-  Room(
-    name: 'Habitación Doble',
-    imageUrl:
-        'https://res.cloudinary.com/dfznn7pui/image/upload/v1760064532/habitacion_3_tyjjyj.png',
-    id: 'R006',
-  ),
-];
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -53,20 +15,56 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   String _searchQuery = '';
-  List<Room> _filteredRooms = dummyRooms;
+  List<Room> _allRooms = [];
+  List<Room> _filteredRooms = [];
+  bool _isLoading = true;
+  bool _hasError = false;
 
-  void _addRoom(BuildContext context) {
-    debugPrint('Botón "Agregar Habitación" presionado.');
+  @override
+  void initState() {
+    super.initState();
+    _fetchRooms();
+  }
+
+  Future<void> _fetchRooms() async {
+    const url =
+        'https://hostalsanrosa-production.up.railway.app/api/habitaciones/todas/';
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        final rooms = data.map((json) => Room.fromJson(json)).toList();
+
+        setState(() {
+          _allRooms = rooms;
+          _filteredRooms = rooms;
+          _isLoading = false;
+        });
+      } else {
+        throw Exception('Error al cargar habitaciones');
+      }
+    } catch (e) {
+      debugPrint('Error al cargar habitaciones: $e');
+      setState(() {
+        _isLoading = false;
+        _hasError = true;
+      });
+    }
   }
 
   void _onSearchChanged(String query) {
     setState(() {
       _searchQuery = query;
-      _filteredRooms = dummyRooms
+      _filteredRooms = _allRooms
           .where((room) =>
-              room.name.toLowerCase().contains(query.toLowerCase()))
+              room.nombre.toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
+  }
+
+  void _addRoom(BuildContext context) {
+    debugPrint('Botón "Agregar Habitación" presionado.');
   }
 
   @override
@@ -76,115 +74,106 @@ class _HomeScreenState extends State<HomeScreen> {
       theme: ThemeData(
         primaryColor: const Color(0XFF2CB7A6),
         useMaterial3: true,
-        textTheme: GoogleFonts.poppinsTextTheme(
-          Theme.of(context).textTheme,
-        ),
+        textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
       ),
       home: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Colors.white,
-          elevation: 0,
-          scrolledUnderElevation: 0.0,
-          toolbarHeight: 80.0,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 10.0,
-                  horizontal: 10.0,
-                ),
-                child: SizedBox(
-                  width: 150,
-                  child: Image.network(
-                    'https://res.cloudinary.com/dfznn7pui/image/upload/v1761514333/LOGO-HOSTAL_yvkmmi.png',
-                    fit: BoxFit.contain,
-                    loadingBuilder: (BuildContext context, Widget child,
-                        ImageChunkEvent? loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
+        appBar: _buildAppBar(),
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _hasError
+                ? const Center(
+                    child: Text(
+                      'Error al cargar habitaciones',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  )
+                : Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        _buildSearchBar(),
+                        const SizedBox(height: 20),
+                        Expanded(
+                          child: _filteredRooms.isEmpty
+                              ? Center(
+                                  child: Text(
+                                    'No se encontraron resultados',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 18,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                )
+                              : GridView.count(
+                                  padding: const EdgeInsets.only(
+                                    top: 0.0,
+                                    left: 16.0,
+                                    right: 16.0,
+                                    bottom: 10.0,
+                                  ),
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 16.0,
+                                  mainAxisSpacing: 16.0,
+                                  children: _filteredRooms
+                                      .map((room) => RoomCard(room: room))
+                                      .toList(),
+                                ),
                         ),
-                      );
-                    },
-                    errorBuilder: (BuildContext context, Object exception,
-                        StackTrace? stackTrace) {
-                      return const Icon(Icons.error, color: Colors.red);
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              _buildSearchBar(),
-              const SizedBox(height: 20),
-              Expanded(
-                child: _filteredRooms.isEmpty
-                    ? Center(
-                        child: Text(
-                          'No se encontraron resultados',
-                          style: GoogleFonts.poppins(
-                            fontSize: 18,
-                            color: Colors.grey,
+                        const SizedBox(height: 20),
+                        ElevatedButton.icon(
+                          onPressed: () => _addRoom(context),
+                          icon: const Icon(Icons.add, color: Colors.white),
+                          label: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 12.0),
+                            child: Text(
+                              'AGREGAR HABITACIÓN',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0XFF2CB7A6),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            elevation: 5,
                           ),
                         ),
-                      )
-                    : GridView.count(
-                        padding: const EdgeInsets.only(
-                          top: 0.0,
-                          left: 16.0,
-                          right: 16.0,
-                          bottom: 10.0,
-                        ),
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 16.0,
-                        mainAxisSpacing: 16.0,
-                        children: _filteredRooms.map((room) {
-                          return RoomCard(room: room);
-                        }).toList(),
-                      ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: () => _addRoom(context),
-                icon: const Icon(Icons.add, color: Colors.white),
-                label: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  child: Text(
-                    'AGREGAR HABITACIÓN',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      ],
                     ),
                   ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0XFF2CB7A6),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 5,
-                ),
+        bottomNavigationBar: const BarraNavegacion(selectedIndex: 1),
+      ),
+    );
+  }
+
+  AppBar _buildAppBar() {
+    return AppBar(
+      automaticallyImplyLeading: false,
+      backgroundColor: Colors.white,
+      elevation: 0,
+      scrolledUnderElevation: 0.0,
+      toolbarHeight: 80.0,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+            child: SizedBox(
+              width: 150,
+              child: Image.network(
+                'https://res.cloudinary.com/dfznn7pui/image/upload/v1761514333/LOGO-HOSTAL_yvkmmi.png',
+                fit: BoxFit.contain,
               ),
-            ],
+            ),
           ),
-        ),
-        bottomNavigationBar: const BarraNavegacion(
-          selectedIndex: 1,
-        ),
+        ],
       ),
     );
   }
@@ -194,10 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(25.0),
-        border: Border.all(
-          color: Colors.grey.shade400,
-          width: 1.0,
-        ),
+        border: Border.all(color: Colors.grey.shade400, width: 1.0),
       ),
       child: TextField(
         onChanged: _onSearchChanged,
@@ -206,12 +192,8 @@ class _HomeScreenState extends State<HomeScreen> {
           hintStyle: GoogleFonts.poppins(color: Colors.grey),
           prefixIcon: const Icon(Icons.search, color: Colors.grey),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.only(
-            top: 10.0,
-            bottom: 10.0,
-            left: 0.0,
-            right: 0.0,
-          ),
+          contentPadding:
+              const EdgeInsets.symmetric(vertical: 10.0, horizontal: 0.0),
         ),
         style: GoogleFonts.poppins(fontSize: 16, color: Colors.grey),
       ),

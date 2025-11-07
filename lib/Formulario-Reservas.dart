@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Importación necesaria para FilteringTextInputFormatter
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -41,7 +42,9 @@ class _MyAppState extends State<MyApp> {
 }
 
 class ReservationForm extends StatefulWidget {
-  const ReservationForm({super.key});
+  final DateTime? initialArrivalDate;
+
+  const ReservationForm({super.key, this.initialArrivalDate});
 
   @override
   State<ReservationForm> createState() => _ReservationFormState();
@@ -61,6 +64,16 @@ class _ReservationFormState extends State<ReservationForm> {
   final primaryColor = const Color(0XFF2CB7A6); // Color principal
 
   @override
+  void initState() {
+    super.initState();
+    // Pre-llena la fecha de llegada si se le pasa una fecha
+    if (widget.initialArrivalDate != null) {
+      _arrivalDateController.text =
+          DateFormat('dd/MM/yyyy').format(widget.initialArrivalDate!);
+    }
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _personsController.dispose();
@@ -72,8 +85,7 @@ class _ReservationFormState extends State<ReservationForm> {
   }
 
   /// Muestra un diálogo de confirmación de reserva con los datos capturados.
-  void _showSuccessDialog() {
-    // Recopilar todos los datos de los controladores
+  void _showSuccessDialog(DateTime arrivalDate) {
     final reservationData = {
       'Huésped': _nameController.text,
       'Personas': _personsController.text,
@@ -129,7 +141,6 @@ class _ReservationFormState extends State<ReservationForm> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Cierra el diálogo
                 // Limpia el formulario
                 _formKey.currentState?.reset();
                 _nameController.clear();
@@ -138,6 +149,13 @@ class _ReservationFormState extends State<ReservationForm> {
                 _departureDateController.clear();
                 _phoneController.clear();
                 _reservationNumberController.clear();
+
+                // 1. Cierra el diálogo de éxito
+                Navigator.of(context).pop();
+
+                // 2. Cierra la pantalla del formulario Y devuelve la fecha.
+                // Esto es crucial para que el calendario se actualice.
+                Navigator.of(context).pop(arrivalDate);
               },
               child: Text(
                 'ACEPTAR',
@@ -156,8 +174,15 @@ class _ReservationFormState extends State<ReservationForm> {
   /// Maneja la validación y el envío del formulario.
   void _submitForm() {
     if (_formKey.currentState!.validate()) {
-      // El formulario es válido, se procede a mostrar el diálogo de éxito
-      _showSuccessDialog();
+      try {
+        final DateTime arrivalDate =
+            DateFormat('dd/MM/yyyy', 'es').parse(_arrivalDateController.text);
+
+        // Muestra el diálogo de éxito y le pasa la fecha a devolver
+        _showSuccessDialog(arrivalDate);
+      } catch (e) {
+        debugPrint('Error al parsear la fecha: $e');
+      }
     }
   }
 
@@ -171,8 +196,6 @@ class _ReservationFormState extends State<ReservationForm> {
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
       builder: (BuildContext context, Widget? child) {
-        // CORRECCIÓN: Se añaden los delegados de localización a Localizations.override
-        // para que el DatePickerDialog tenga acceso a las MaterialLocalizations.
         return Localizations.override(
           context: context,
           locale: const Locale('es'),
@@ -349,7 +372,7 @@ class _ReservationFormState extends State<ReservationForm> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 80, vertical: 20),
                     ),
-                    onPressed: _submitForm, // Llamada al nuevo método de envío
+                    onPressed: _submitForm,
                     child: Text(
                       'CREAR RESERVA',
                       style: GoogleFonts.poppins(
@@ -375,6 +398,12 @@ class _ReservationFormState extends State<ReservationForm> {
     TextInputType? keyboardType,
     required InputDecoration inputDecoration,
   }) {
+    // Definir los formatters para restringir a solo dígitos
+    final List<TextInputFormatter>? inputFormatters =
+        (keyboardType == TextInputType.number || keyboardType == TextInputType.phone)
+            ? [FilteringTextInputFormatter.digitsOnly]
+            : null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -391,12 +420,13 @@ class _ReservationFormState extends State<ReservationForm> {
           width: MediaQuery.of(context).size.width * 0.8,
           child: TextFormField(
             controller: controller,
-            keyboardType: keyboardType,
+            keyboardType: keyboardType, // Teclado numérico
+            inputFormatters: inputFormatters, // Restricción a solo dígitos
             style: GoogleFonts.poppins(color: Colors.grey, fontSize: 16),
             decoration: inputDecoration.copyWith(
-              // Uso de labelText en lugar de hint para mejor accesibilidad y diseño
               labelStyle: GoogleFonts.poppins(color: primaryColor),
-              floatingLabelStyle: GoogleFonts.poppins(color: primaryColor, fontWeight: FontWeight.bold),
+              floatingLabelStyle:
+                  GoogleFonts.poppins(color: primaryColor, fontWeight: FontWeight.bold),
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -436,7 +466,8 @@ class _ReservationFormState extends State<ReservationForm> {
             style: GoogleFonts.poppins(color: Colors.grey, fontSize: 16),
             decoration: inputDecoration.copyWith(
               labelStyle: GoogleFonts.poppins(color: primaryColor),
-              floatingLabelStyle: GoogleFonts.poppins(color: primaryColor, fontWeight: FontWeight.bold),
+              floatingLabelStyle:
+                  GoogleFonts.poppins(color: primaryColor, fontWeight: FontWeight.bold),
             ),
             onTap: () => _selectDate(context, controller),
             validator: (value) {

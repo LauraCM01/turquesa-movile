@@ -10,6 +10,81 @@ class LoginPage extends StatefulWidget {
   // El constructor constante mejora el rendimiento.
   const LoginPage({super.key});
 
+  Future<void> _submitForm(emailAddress, password, context) async {
+    try {
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailAddress,
+        password: password,
+      );
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Usuario no encontrado'),
+              content: const Text(
+                'No existe una cuenta registrada con ese correo electrónico.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      } else if (e.code == 'wrong-password') {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('CLave incorrecta'),
+              content: const Text(
+                'La clave que estas ingresando no es correcta',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Text('Usuario no encontrado'),
+              content: const Text(
+                'No existe una cuenta registrada con ese correo electrónico.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+  }
+
   @override
   // El método createState es obligatorio en un StatefulWidget y devuelve una instancia de su clase de estado asociada.
   State<LoginPage> createState() => _LoginPageState();
@@ -210,11 +285,10 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.push(
+                    widget._submitForm(
+                      _usernameController.text,
+                      _passwordController.text,
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => const HomeScreen(),
-                      ),
                     );
                   },
                   child: const Text('INGRESAR'),
