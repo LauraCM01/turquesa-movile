@@ -374,51 +374,6 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
                 const SizedBox(height: 24.0),
-
-                // Sección de login social.
-                Row(
-                  children: <Widget>[
-                    Expanded(child: Divider(color: Colors.grey.shade400)),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Text(
-                        "O",
-                        style: GoogleFonts.poppins(
-                          color: Colors.grey,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                    Expanded(child: Divider(color: Colors.grey)),
-                  ],
-                ),
-                const SizedBox(height: 24.0),
-
-                ElevatedButton.icon(
-                  icon: Image.network(
-                    'https://res.cloudinary.com/dfznn7pui/image/upload/v1760138499/google_wkaueo.png',
-                    height: 24.0,
-                  ),
-                  label: const Text('Inicia sesión con Google'),
-                  onPressed: () {
-                    // TODO: Implementar la lógica de inicio de sesión con Google.
-                  },
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.grey,
-                    backgroundColor: Colors.grey[200],
-                    minimumSize: const Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    textStyle: GoogleFonts.poppins(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 48.0),
-
-                const SizedBox(height: 24.0),
               ],
             ),
           ),

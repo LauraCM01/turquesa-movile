@@ -1,19 +1,114 @@
+// 🟢 profile_screen.dart - Implementación para leer datos de Firestore
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:myapp/widgets/Barra-Navegacion.dart';
 import 'Pantalla-Login.dart';
 import 'Pantalla-Inicio.dart';
 
-class ProfileScreen extends StatelessWidget {
+// 1. Crear un modelo de datos para mapear los campos de Firestore
+class UserData {
+  final String nombre;
+  final String apellido;
+  final String cedula;
+  final String correo;
+
+  UserData({
+    required this.nombre,
+    required this.apellido,
+    required this.cedula,
+    required this.correo,
+  });
+
+  factory UserData.fromFirestore(Map<String, dynamic> data) {
+    return UserData(
+      // Usar 'N/A' si el campo no existe o es nulo
+      nombre: data['nombre'] ?? 'N/A',
+      apellido: data['apellido'] ?? 'N/A',
+      cedula: data['cedula'] ?? 'N/A',
+      correo: data['correo'] ?? 'N/A',
+    );
+  }
+}
+
+// 2. Convertir a StatefulWidget para manejar la carga de datos
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
-  // ✅ SOLUCIÓN: Definir el estilo de texto para los valores
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  // Estado para guardar los datos del usuario
+  UserData? _userData;
+  bool _isLoading = true;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    // Iniciar la carga de datos cuando el widget se inicializa
+    _fetchUserData();
+  }
+
+  // 3. Función para cargar los datos desde Firestore
+  Future<void> _fetchUserData() async {
+    final user = _auth.currentUser;
+
+    if (user == null) {
+      if (mounted) {
+        setState(() {
+          _errorMessage =
+              'No hay usuario autenticado. Por favor, inicia sesión.';
+          _isLoading = false;
+        });
+      }
+      return;
+    }
+
+    try {
+      // Obtener el documento con el UID del usuario
+      final docSnapshot = await _db.collection('usuarios').doc(user.uid).get();
+
+      if (docSnapshot.exists && docSnapshot.data() != null) {
+        final data = docSnapshot.data()!;
+        if (mounted) {
+          setState(() {
+            _userData = UserData.fromFirestore(data);
+            _isLoading = false;
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _errorMessage =
+                'No se encontraron datos del perfil en Firestore. UID: ${user.uid}';
+            _isLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error fetching user data: $e');
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Error al cargar los datos: $e';
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  // Estilos y constructores de widgets (mantenidos del código original)
   final TextStyle _valueTextStyle = const TextStyle(
     color: Colors.grey,
     fontSize: 14,
   );
 
-  // ✅ SOLUCIÓN: Definir la función que crea el borde
   OutlineInputBorder _customBorder({required Color color}) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(20.0),
@@ -21,8 +116,94 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildTextField({required String label, required String value}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(color: Colors.grey)),
+          const SizedBox(height: 5),
+          TextFormField(
+            initialValue: value,
+            readOnly: true,
+            style: _valueTextStyle,
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 8.0,
+                horizontal: 10.0,
+              ),
+              enabledBorder: _customBorder(color: const Color(0XFF2CB7A6)),
+              focusedBorder: _customBorder(color: const Color(0XFF2CB7A6)),
+              border: _customBorder(color: Colors.grey),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDateField({required String label, required String value}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(color: Colors.grey)),
+          const SizedBox(height: 5),
+          TextFormField(
+            initialValue: value,
+            readOnly: true,
+            style: _valueTextStyle,
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(
+                vertical: 8.0,
+                horizontal: 10.0,
+              ),
+              enabledBorder: _customBorder(color: const Color(0XFF2CB7A6)),
+              focusedBorder: _customBorder(color: const Color(0XFF2CB7A6)),
+              border: _customBorder(color: Colors.grey),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    // 4. Mostrar estado de carga o error
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: CircularProgressIndicator(color: Color(0XFF2CB7A6)),
+        ),
+        bottomNavigationBar: BarraNavegacion(selectedIndex: 2),
+      );
+    }
+
+    if (_errorMessage != null) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Text(
+              'Error al cargar perfil: $_errorMessage',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(color: Colors.red),
+            ),
+          ),
+        ),
+        bottomNavigationBar: const BarraNavegacion(selectedIndex: 2),
+      );
+    }
+
+    // Si los datos se cargaron correctamente:
+    final user = _userData!;
+    final fullName = '${user.nombre} ${user.apellido}';
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -33,7 +214,8 @@ class ProfileScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0XFF2CB7A6)),
           onPressed: () {
-            Navigator.push(
+            // Usa pushReplacement para evitar acumular rutas
+            Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const HomeScreen()),
             );
@@ -49,11 +231,16 @@ class ProfileScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.exit_to_app, color: Color(0XFF2CB7A6)),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginPage()),
-              );
+            onPressed: () async {
+              // Cierra sesión en Firebase
+              await _auth.signOut();
+              if (mounted) {
+                // Navega a LoginPage y elimina todas las rutas anteriores
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
+                  (Route<dynamic> route) => false,
+                );
+              }
             },
           ),
         ],
@@ -69,26 +256,24 @@ class ProfileScreen extends StatelessWidget {
                 child: Icon(Icons.person, size: 70, color: Color(0XFF2CB7A6)),
               ),
               const SizedBox(height: 30),
-              _buildTextField(label: 'Nombre', value: 'Adriana Zuleta'),
+              // 5. Usar los datos reales del usuario
+              _buildTextField(label: 'Nombre Completo', value: fullName),
               const SizedBox(height: 20),
-              _buildTextField(label: 'Usuario', value: 'Recepcionista-2'),
+              _buildTextField(label: 'Correo', value: user.correo),
               const SizedBox(height: 20),
-              _buildTextField(
-                label: 'Correo',
-                value: 'adriana@hostalturquesa.com',
-              ),
-              const SizedBox(height: 20),
-              _buildDateField(
-                label: 'Cédula',
-                value: '1001456728',
-              ),
+              _buildDateField(label: 'Cédula', value: user.cedula),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const LoginPage()),
-                  );
+                onPressed: () async {
+                  await _auth.signOut();
+                  if (mounted) {
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (context) => const LoginPage(),
+                      ),
+                      (Route<dynamic> route) => false,
+                    );
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0XFF2CB7A6),
@@ -112,69 +297,6 @@ class ProfileScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: const BarraNavegacion(selectedIndex: 2),
-    );
-  }
-
-  Widget _buildTextField({required String label, required String value}) {
-    // 💡 CAMBIO: El Padding ahora envuelve todo el Column
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 20.0,
-      ), // Ajuste horizontal
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Esta es la etiqueta que queremos mover
-          Text(label, style: const TextStyle(color: Colors.grey)),
-          const SizedBox(height: 5),
-          TextFormField(
-            initialValue: value,
-            readOnly: true,
-            style: _valueTextStyle,
-            decoration: InputDecoration(
-              // El padding interno (contentPadding) se mantiene para el texto
-              contentPadding: const EdgeInsets.symmetric(
-                vertical: 8.0,
-                horizontal: 10.0,
-              ),
-              enabledBorder: _customBorder(color: Color(0XFF2CB7A6)),
-              focusedBorder: _customBorder(color: Color(0XFF2CB7A6)),
-              border: _customBorder(color: Colors.grey),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDateField({required String label, required String value}) {
-    // 💡 CAMBIO: El Padding ahora envuelve todo el Column
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 20.0,
-        vertical: 5.0,
-      ), // Ajuste horizontal
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(color: Colors.grey)),
-          const SizedBox(height: 5),
-          TextFormField(
-            initialValue: value,
-            readOnly: true,
-            style: _valueTextStyle,
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(
-                vertical: 8.0,
-                horizontal: 10.0,
-              ),
-              enabledBorder: _customBorder(color: Color(0XFF2CB7A6)),
-              focusedBorder: _customBorder(color: Color(0XFF2CB7A6)),
-              border: _customBorder(color: Colors.grey),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/Pantalla-Chat.dart';
 import 'package:myapp/Pantalla-Inicio.dart';
 import 'package:myapp/Pantalla-Perfil.dart';
-import 'package:myapp/chat_screen.dart';
+
 
 class BarraNavegacion extends StatefulWidget {
   final int selectedIndex;
@@ -33,7 +34,7 @@ class _BarraNavegacionState extends State<BarraNavegacion> {
       case 0:
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const ChatScreen()),
+          MaterialPageRoute(builder: (context) => const PantallaChat()),
         );
         break;
       case 1:

@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _fetchRooms() async {
     const url =
-        'https://hostalsanrosa-production.up.railway.app/api/habitaciones/todas/';
+        'https://hostalsanrosa-production.up.railway.app/api/habitaciones/';
     try {
       final response = await http.get(Uri.parse(url));
 
@@ -57,8 +57,9 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _searchQuery = query;
       _filteredRooms = _allRooms
-          .where((room) =>
-              room.nombre.toLowerCase().contains(query.toLowerCase()))
+          .where(
+            (room) => room.nombre.toLowerCase().contains(query.toLowerCase()),
+          )
           .toList();
     });
   }
@@ -82,71 +83,71 @@ class _HomeScreenState extends State<HomeScreen> {
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _hasError
-                ? const Center(
-                    child: Text(
-                      'Error al cargar habitaciones',
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        _buildSearchBar(),
-                        const SizedBox(height: 20),
-                        Expanded(
-                          child: _filteredRooms.isEmpty
-                              ? Center(
-                                  child: Text(
-                                    'No se encontraron resultados',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 18,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                )
-                              : GridView.count(
-                                  padding: const EdgeInsets.only(
-                                    top: 0.0,
-                                    left: 16.0,
-                                    right: 16.0,
-                                    bottom: 10.0,
-                                  ),
-                                  crossAxisCount: 2,
-                                  crossAxisSpacing: 16.0,
-                                  mainAxisSpacing: 16.0,
-                                  children: _filteredRooms
-                                      .map((room) => RoomCard(room: room))
-                                      .toList(),
+            ? const Center(
+                child: Text(
+                  'Error al cargar habitaciones',
+                  style: TextStyle(color: Colors.red),
+                ),
+              )
+            : Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    _buildSearchBar(),
+                    const SizedBox(height: 20),
+                    Expanded(
+                      child: _filteredRooms.isEmpty
+                          ? Center(
+                              child: Text(
+                                'No se encontraron resultados',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18,
+                                  color: Colors.grey,
                                 ),
-                        ),
-                        const SizedBox(height: 20),
-                        ElevatedButton.icon(
-                          onPressed: () => _addRoom(context),
-                          icon: const Icon(Icons.add, color: Colors.white),
-                          label: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 12.0),
-                            child: Text(
-                              'AGREGAR HABITACIÓN',
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
                               ),
+                            )
+                          : GridView.count(
+                              padding: const EdgeInsets.only(
+                                top: 0.0,
+                                left: 16.0,
+                                right: 16.0,
+                                bottom: 10.0,
+                              ),
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 16.0,
+                              mainAxisSpacing: 16.0,
+                              children: _filteredRooms
+                                  .map((room) => RoomCard(room: room))
+                                  .toList(),
                             ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0XFF2CB7A6),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            elevation: 5,
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton.icon(
+                      onPressed: () => _addRoom(context),
+                      icon: const Icon(Icons.add, color: Colors.white),
+                      label: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 12.0),
+                        child: Text(
+                          'AGREGAR HABITACIÓN',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
                           ),
                         ),
-                      ],
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0XFF2CB7A6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 5,
+                      ),
                     ),
-                  ),
+                  ],
+                ),
+              ),
         bottomNavigationBar: const BarraNavegacion(selectedIndex: 1),
       ),
     );
@@ -163,8 +164,10 @@ class _HomeScreenState extends State<HomeScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
-            padding:
-                const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+            padding: const EdgeInsets.symmetric(
+              vertical: 10.0,
+              horizontal: 10.0,
+            ),
             child: SizedBox(
               width: 150,
               child: Image.network(
@@ -192,8 +195,10 @@ class _HomeScreenState extends State<HomeScreen> {
           hintStyle: GoogleFonts.poppins(color: Colors.grey),
           prefixIcon: const Icon(Icons.search, color: Colors.grey),
           border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(vertical: 10.0, horizontal: 0.0),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 10.0,
+            horizontal: 0.0,
+          ),
         ),
         style: GoogleFonts.poppins(fontSize: 16, color: Colors.grey),
       ),
