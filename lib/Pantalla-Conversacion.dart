@@ -3,11 +3,18 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:myapp/chat_list/chat_message.dart';
 import 'package:myapp/chat_list/message_buble.dart';
+import 'package:myapp/chat_list/chat_model.dart'; // ⭐ Importar el modelo Chat
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
+  // ⭐ NUEVA PROPIEDAD: Objeto Chat opcional
+  final Chat? chat; 
 
-  const ChatScreen({super.key, required this.chatId});
+  const ChatScreen({
+    super.key, 
+    required this.chatId, 
+    this.chat // Permitir que se pase el objeto Chat
+  });
 
   @override
   State<ChatScreen> createState() => _ChatScreenState();
@@ -26,6 +33,7 @@ class _ChatScreenState extends State<ChatScreen> {
   void initState() {
     super.initState();
     print('Cargando mensajes para el chat ID: ${widget.chatId}');
+    // Opcionalmente, aquí podrías usar widget.chat para cargar mensajes reales
   }
 
   void _handleSubmitted(String text) {
@@ -47,9 +55,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final String displayChatName = 'Chat con ${widget.chatId.substring(0, 8)}...';
+    // ⭐ CAMBIO: Usar el nombre del chat (si existe) o el ID parcial como fallback
+    final String displayChatName = widget.chat?.name ?? 'Chat: ${widget.chatId.substring(0, 8)}...';
 
-    // Re-added Scaffold to make this screen independent
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -58,11 +66,11 @@ class _ChatScreenState extends State<ChatScreen> {
         toolbarHeight: 80.0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0xFF2CB7A6)),
-          // This now explicitly navigates to the chat list screen
+          // ✅ Regresa a la lista de chats
           onPressed: () => context.go('/chat'),
         ),
         title: Text(
-          displayChatName,
+          displayChatName, // Muestra el nombre completo
           style: GoogleFonts.poppins(
             color: const Color(0xFF2CB7A6),
             fontWeight: FontWeight.bold,
@@ -131,7 +139,6 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ],
       ),
-      // Notice there is NO bottomNavigationBar here
     );
   }
 }

@@ -1,14 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:myapp/chat_list/chat_list_screen.dart';
-import 'Pantalla-Conversacion.dart';
-import 'Pantalla-Perfil.dart'; // Asegúrate de que este archivo existe
-import 'Pantalla-Inicio.dart'; // Asegúrate de que este archivo existe
+import 'package:myapp/chat_list/chat_model.dart'; 
+import 'Pantalla-Conversacion.dart'; // ChatScreen
+import 'Pantalla-Perfil.dart';      // ProfileScreen
+import 'Pantalla-Inicio.dart';     // HomeScreen
+import 'Pantalla-Login.dart';      // ⭐ NUEVA IMPORTACIÓN: LoginPage
 
 final router = GoRouter(
-  initialLocation: '/',
+  // ⭐ INICIO: Establece /login como la primera pantalla.
+  initialLocation: '/login',
   routes: [
-    // Home Route
+    
+    // ⭐ RUTA DE LOGIN
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => LoginPage(), // Asumiendo que es tu clase LoginPage
+    ),
+
+    // Home Route (La ruta principal de la aplicación)
     GoRoute(
       path: '/',
       builder: (context, state) => const HomeScreen(),
@@ -26,19 +36,25 @@ final router = GoRouter(
       builder: (BuildContext context, GoRouterState state) {
         return const ChatListScreen();
       },
-    ),
+      // Rutas anidadas para la conversación individual
+      routes: [
+        GoRoute(
+          path: ':chatId', 
+          builder: (BuildContext context, GoRouterState state) {
+            final chatId = state.pathParameters['chatId']!;
+            final chatData = state.extra;
 
-    // Individual Chat Route (Child: /chat/:chatId)
-    GoRoute(
-      path: '/chat/:chatId', // Este camino coincide con el context.go('/chat/${chat.id}')
-      builder: (BuildContext context, GoRouterState state) {
-        final chatId = state.pathParameters['chatId']!;
-        return ChatScreen(chatId: chatId);
-      },
+            return ChatScreen(
+              chatId: chatId, 
+              chat: chatData is Chat ? chatData : null, 
+            ); 
+          },
+        ),
+      ],
     ),
   ],
 
-  // Error handling for not found routes
+  // Manejo de errores (sin cambios)
   errorPageBuilder: (context, state) {
     return MaterialPage(
       key: state.pageKey,

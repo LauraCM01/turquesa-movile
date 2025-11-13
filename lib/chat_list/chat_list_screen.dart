@@ -114,8 +114,11 @@ class _ChatListScreenState extends State<ChatListScreen> {
               itemBuilder: (context, index) {
                 final chat = _filteredChats[index];
                 return InkWell(
-                  // *** CORREGIDO: Usar '/chat/' en singular ***
-                  onTap: () => context.go('/chat/${chat.id}'),
+                  // ⭐ CAMBIO: Pasar el objeto 'chat' en 'extra'
+                  onTap: () => context.go(
+                    '/chat/${chat.id}',
+                    extra: chat, // Aquí se pasa el objeto completo
+                  ),
                   child: ChatListItem(chat: chat),
                 );
               },
