@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:myapp/chat_list/chat_list_item.dart';
 import 'package:myapp/chat_list/chat_model.dart';
-import 'package:myapp/widgets/Barra-Navegacion.dart';
 import 'package:uuid/uuid.dart';
 
 class ChatListScreen extends StatefulWidget {
@@ -126,7 +125,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: const BarraNavegacion(selectedIndex: 0),
     );
   }
 }

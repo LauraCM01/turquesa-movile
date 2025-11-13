@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:myapp/Pantalla-Chat.dart';
-import 'package:myapp/Pantalla-Inicio.dart';
-import 'package:myapp/Pantalla-Perfil.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-
-class BarraNavegacion extends StatefulWidget {
+class BarraNavegacion extends StatelessWidget {
   final int selectedIndex;
 
   const BarraNavegacion({
@@ -12,42 +10,16 @@ class BarraNavegacion extends StatefulWidget {
     required this.selectedIndex,
   });
 
-  @override
-  State<BarraNavegacion> createState() => _BarraNavegacionState();
-}
-
-class _BarraNavegacionState extends State<BarraNavegacion> {
-  late int _selectedIndex;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedIndex = widget.selectedIndex;
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
+  void _onItemTapped(BuildContext context, int index) {
     switch (index) {
       case 0:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const PantallaChat()),
-        );
+        context.go('/chat'); // Navega a la lista de chats
         break;
       case 1:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
+        context.go('/inicio'); // ⭐ Navega a la nueva ruta de inicio
         break;
       case 2:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const ProfileScreen()),
-        );
+        context.go('/perfil'); // Navega a la pantalla de perfil
         break;
     }
   }
@@ -55,16 +27,17 @@ class _BarraNavegacionState extends State<BarraNavegacion> {
   @override
   Widget build(BuildContext context) {
     return BottomNavigationBar(
-      currentIndex: _selectedIndex,
-      onTap: _onItemTapped,
+      currentIndex: selectedIndex,
+      onTap: (index) => _onItemTapped(context, index),
       selectedItemColor: const Color(0XFF2CB7A6),
       unselectedItemColor: Colors.grey[400],
       backgroundColor: Colors.white,
       elevation: 10,
       iconSize: 20,
-      selectedFontSize: 12.0, // Tamaño de fuente para el ítem seleccionado
-      unselectedFontSize: 12.0, // Tamaño de fuente para los ítems no seleccionados
-      
+      selectedFontSize: 12.0,
+      unselectedFontSize: 12.0,
+      selectedLabelStyle: GoogleFonts.poppins(),
+      unselectedLabelStyle: GoogleFonts.poppins(),
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.chat_bubble_outline),

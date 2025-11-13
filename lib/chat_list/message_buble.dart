@@ -18,7 +18,7 @@ class ChatMessageBubble extends StatelessWidget {
           maxWidth: MediaQuery.of(context).size.width * 0.75,
         ),
         decoration: BoxDecoration(
-          color: isMe ? const Color(0xFF2CB7A6) : Colors.grey[200],
+          color: isMe ? const Color(0xFF2CB7A6) : const Color.fromARGB(255, 255, 255, 255),
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
@@ -30,7 +30,7 @@ class ChatMessageBubble extends StatelessWidget {
           message,
           style: GoogleFonts.poppins(
             color: isMe ? Colors.white : Colors.grey,
-            fontSize: 15,
+            fontSize: 13,
           ),
         ),
       ),

@@ -59,6 +59,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final String displayChatName = widget.chat?.name ?? 'Chat: ${widget.chatId.substring(0, 8)}...';
 
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 240, 240, 240),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -74,6 +75,7 @@ class _ChatScreenState extends State<ChatScreen> {
           style: GoogleFonts.poppins(
             color: const Color(0xFF2CB7A6),
             fontWeight: FontWeight.bold,
+            fontSize: 20,
           ),
         ),
       ),
@@ -112,7 +114,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       controller: _textController,
                       decoration: InputDecoration(
                         hintText: 'Escribe un mensaje...',
-                        hintStyle: GoogleFonts.poppins(color: Colors.grey),
+                        hintStyle: GoogleFonts.poppins(color: Colors.grey, fontSize: 14),
                         filled: true,
                         fillColor: Colors.grey[100],
                         border: OutlineInputBorder(

@@ -36,7 +36,7 @@ class ChatListItem extends StatelessWidget {
                   chat.name,
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 14,
                     color: Colors.grey,
                   ),
                   overflow: TextOverflow.ellipsis,
@@ -46,7 +46,7 @@ class ChatListItem extends StatelessWidget {
                   chat.lastMessage,
                   style: GoogleFonts.poppins(
                     color: Colors.grey,
-                    fontSize: 14,
+                    fontSize: 12,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -61,7 +61,7 @@ class ChatListItem extends StatelessWidget {
               Text(
                 chat.time,
                 style: GoogleFonts.poppins(
-                  fontSize: 12,
+                  fontSize: 13,
                   color: chat.unreadCount > 0 ? const Color(0xFF2CB7A6) : Colors.grey,
                 ),
               ),
@@ -77,7 +77,7 @@ class ChatListItem extends StatelessWidget {
                     chat.unreadCount.toString(),
                     style: GoogleFonts.poppins(
                       color: Colors.white,
-                      fontSize: 10,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

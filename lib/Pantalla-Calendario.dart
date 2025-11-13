@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:myapp/models/room.dart';
 import 'package:myapp/services/calendarioService.dart';
-import 'package:myapp/widgets/Barra-Navegacion.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
 import 'Pantalla-Estados.dart';
@@ -256,7 +255,6 @@ class _CalendarPageState extends State<CalendarPage> {
                 ],
               ),
             ),
-      bottomNavigationBar: const BarraNavegacion(selectedIndex: 1),
     );
   }
 }

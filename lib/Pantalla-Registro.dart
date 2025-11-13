@@ -1,9 +1,8 @@
-// 🟢 pantalla_registro.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:myapp/Pantalla-Inicio.dart';
+import 'package:go_router/go_router.dart';
 
 class PantallaRegistro extends StatefulWidget {
   const PantallaRegistro({super.key});
@@ -33,6 +32,36 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
     super.dispose();
   }
 
+  // ✅ FUNCIÓN AUXILIAR PARA MOSTRAR SNACKBAR CON ESTILO
+  void _showStyledSnackBar(String message, {bool isSuccess = false}) {
+    if (!mounted) return;
+
+    final Color primaryColor = Color(0XFF2CB7A6);
+    final Color backgroundColor = isSuccess
+        ? Colors.grey.shade200
+        : Colors.red.shade100;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        // Fondo gris claro
+        backgroundColor: backgroundColor,
+        duration: const Duration(seconds: 3),
+        content: Text(
+          message,
+          style: GoogleFonts.poppins(
+            // Texto turquesa
+            color: isSuccess ? primaryColor : Colors.red.shade700,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        // Puedes darle esquinas redondeadas si deseas
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.all(10),
+      ),
+    );
+  }
+
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -48,9 +77,8 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
       await guardarDatosFormulario(credential);
 
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Registro exitoso 🎉')));
+        // ✅ USANDO LA FUNCIÓN DE ESTILO PARA ÉXITO
+        _showStyledSnackBar('Registro exitoso', isSuccess: true);
       }
     } on FirebaseAuthException catch (e) {
       String mensaje = 'Error desconocido';
@@ -62,14 +90,16 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
         mensaje = 'El correo no es válido.';
       }
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(mensaje)));
+      // ✅ USANDO LA FUNCIÓN DE ESTILO PARA ERROR
+      if (mounted) {
+        _showStyledSnackBar(mensaje, isSuccess: false);
+      }
     } catch (e) {
       print(e);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (mounted) {
+        // ✅ USANDO LA FUNCIÓN DE ESTILO PARA ERROR GENERAL
+        _showStyledSnackBar('Error: $e', isSuccess: false);
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -95,15 +125,18 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
       print('Usuario guardado en Firestore con UID: ${user.uid}');
 
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const HomeScreen()),
-        );
+        // Navegación con GoRouter a la ruta de inicio
+        context.go('/inicio');
       }
     } catch (e) {
       print('Error al guardar en Firestore: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error al guardar datos en Firestore')),
-      );
+      if (mounted) {
+        // ✅ USANDO LA FUNCIÓN DE ESTILO PARA ERROR DE FIRESTORE
+        _showStyledSnackBar(
+          'Error al guardar datos en Firestore',
+          isSuccess: false,
+        );
+      }
     }
   }
 
@@ -115,7 +148,7 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Color(0XFF2CB7A6)),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => context.pop(),
         ),
       ),
       backgroundColor: Colors.white,
@@ -226,7 +259,7 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () => Navigator.of(context).pop(),
+                        onPressed: () => context.pop(),
                         child: Text(
                           'Inicia sesión',
                           style: GoogleFonts.poppins(

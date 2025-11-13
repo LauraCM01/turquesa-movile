@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:myapp/widgets/Barra-Navegacion.dart';
-import 'Pantalla-Login.dart';
-import 'Pantalla-Inicio.dart';
+import 'package:go_router/go_router.dart'; // ⭐ NECESARIO PARA USAR GO_ROUTER
 
 // 1. Crear un modelo de datos para mapear los campos de Firestore
 class UserData {
@@ -104,7 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   // Estilos y constructores de widgets (mantenidos del código original)
-  final TextStyle _valueTextStyle = const TextStyle(
+  TextStyle get _valueTextStyle => GoogleFonts.poppins(
     color: Colors.grey,
     fontSize: 14,
   );
@@ -122,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(color: Colors.grey)),
+          Text(label, style: GoogleFonts.poppins(color: Colors.grey)),
           const SizedBox(height: 5),
           TextFormField(
             initialValue: value,
@@ -149,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(color: Colors.grey)),
+          Text(label, style: GoogleFonts.poppins(color: Colors.grey)),
           const SizedBox(height: 5),
           TextFormField(
             initialValue: value,
@@ -179,7 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         body: Center(
           child: CircularProgressIndicator(color: Color(0XFF2CB7A6)),
         ),
-        bottomNavigationBar: BarraNavegacion(selectedIndex: 2),
+        // ❌ ELIMINADA bottomNavigationBar
       );
     }
 
@@ -196,7 +194,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
         ),
-        bottomNavigationBar: const BarraNavegacion(selectedIndex: 2),
+        // ❌ ELIMINADA bottomNavigationBar
       );
     }
 
@@ -211,16 +209,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 0,
         scrolledUnderElevation: 0.0,
         toolbarHeight: 80.0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0XFF2CB7A6)),
-          onPressed: () {
-            // Usa pushReplacement para evitar acumular rutas
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
-            );
-          },
-        ),
         title: Text(
           'Perfil',
           style: GoogleFonts.poppins(
@@ -235,11 +223,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // Cierra sesión en Firebase
               await _auth.signOut();
               if (mounted) {
-                // Navega a LoginPage y elimina todas las rutas anteriores
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                  (Route<dynamic> route) => false,
-                );
+                // ⭐ CORRECCIÓN DE NAVEGACIÓN: Usar GoRouter para ir al Login y eliminar la pila
+                context.go('/login'); // Asumiendo que '/' es la ruta del login
               }
             },
           ),
@@ -267,12 +252,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 onPressed: () async {
                   await _auth.signOut();
                   if (mounted) {
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                        builder: (context) => const LoginPage(),
-                      ),
-                      (Route<dynamic> route) => false,
-                    );
+                    context.go('/login');
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -296,7 +276,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: const BarraNavegacion(selectedIndex: 2),
     );
   }
 }

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:myapp/models/room.dart';
-import 'widgets/Barra-Navegacion.dart';
 import 'widgets/room_card.dart';
 
+// HomeScreen ya no necesita tener el tema o MaterialApp
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -71,86 +71,79 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Turquesa Hostal',
-      theme: ThemeData(
-        primaryColor: const Color(0XFF2CB7A6),
-        useMaterial3: true,
-        textTheme: GoogleFonts.poppinsTextTheme(Theme.of(context).textTheme),
-      ),
-      home: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: _buildAppBar(),
-        body: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : _hasError
-            ? const Center(
-                child: Text(
-                  'Error al cargar habitaciones wwsws',
-                  style: TextStyle(color: Colors.red),
-                ),
-              )
-            : Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    _buildSearchBar(),
-                    const SizedBox(height: 20),
-                    Expanded(
-                      child: _filteredRooms.isEmpty
-                          ? Center(
-                              child: Text(
-                                'No se encontraron resultados',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 18,
-                                  color: Colors.grey,
+    // ⭐ CAMBIO CLAVE: Eliminar MaterialApp y devolver Scaffold directamente.
+    // El tema ya se aplica desde el MaterialApp.router principal.
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: _buildAppBar(),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _hasError
+              ? const Center(
+                  child: Text(
+                    'Error al cargar habitaciones wwsws',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      _buildSearchBar(),
+                      const SizedBox(height: 20),
+                      Expanded(
+                        child: _filteredRooms.isEmpty
+                            ? Center(
+                                child: Text(
+                                  'No se encontraron resultados',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 18,
+                                    color: Colors.grey,
+                                  ),
                                 ),
+                              )
+                            : GridView.count(
+                                padding: const EdgeInsets.only(
+                                  top: 0.0,
+                                  left: 16.0,
+                                  right: 16.0,
+                                  bottom: 10.0,
+                                ),
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 16.0,
+                                mainAxisSpacing: 16.0,
+                                children: _filteredRooms
+                                    .map((room) => RoomCard(room: room))
+                                    .toList(),
                               ),
-                            )
-                          : GridView.count(
-                              padding: const EdgeInsets.only(
-                                top: 0.0,
-                                left: 16.0,
-                                right: 16.0,
-                                bottom: 10.0,
-                              ),
-                              crossAxisCount: 2,
-                              crossAxisSpacing: 16.0,
-                              mainAxisSpacing: 16.0,
-                              children: _filteredRooms
-                                  .map((room) => RoomCard(room: room))
-                                  .toList(),
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: () => _addRoom(context),
+                        icon: const Icon(Icons.add, color: Colors.white),
+                        label: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12.0),
+                          child: Text(
+                            'AGREGAR HABITACIÓN',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
-                    ),
-                    const SizedBox(height: 20),
-                    ElevatedButton.icon(
-                      onPressed: () => _addRoom(context),
-                      icon: const Icon(Icons.add, color: Colors.white),
-                      label: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12.0),
-                        child: Text(
-                          'AGREGAR HABITACIÓN',
-                          style: GoogleFonts.poppins(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
                           ),
                         ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0XFF2CB7A6),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0XFF2CB7A6),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 5,
                         ),
-                        elevation: 5,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-        bottomNavigationBar: const BarraNavegacion(selectedIndex: 1),
-      ),
     );
   }
 

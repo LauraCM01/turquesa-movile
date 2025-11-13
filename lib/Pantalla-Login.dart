@@ -1,89 +1,14 @@
-// Importa la biblioteca principal de Material Design de Flutter.
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'Pantalla-Inicio.dart';
-import 'Pantalla-Registro.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:go_router/go_router.dart'; 
 
 // Define la clase LoginPage, que es un widget con estado (StatefulWidget).
 class LoginPage extends StatefulWidget {
-  // El constructor constante mejora el rendimiento.
   const LoginPage({super.key});
 
-  Future<void> _submitForm(emailAddress, password, context) async {
-    try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailAddress,
-        password: password,
-      );
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text('Usuario no encontrado'),
-              content: const Text(
-                'No existe una cuenta registrada con ese correo electrónico.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      } else if (e.code == 'wrong-password') {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text('CLave incorrecta'),
-              content: const Text(
-                'La clave que estas ingresando no es correcta',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      } else {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text('Usuario no encontrado'),
-              content: const Text(
-                'No existe una cuenta registrada con ese correo electrónico.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      }
-    }
-  }
+  // *** El método _submitForm ha sido ELIMINADO de aquí (LoginPage) ***
+  // *** y MOVIDO a la clase _LoginPageState para usar el contexto (context) correctamente. ***
 
   @override
   // El método createState es obligatorio en un StatefulWidget y devuelve una instancia de su clase de estado asociada.
@@ -91,25 +16,66 @@ class LoginPage extends StatefulWidget {
 }
 
 // La clase _LoginPageState contiene el estado y la lógica de la interfaz de usuario para LoginPage.
-// El guion bajo (_) al principio del nombre la hace privada para este archivo.
 class _LoginPageState extends State<LoginPage> {
-  // Aquí puedes declarar variables que mantendrán el estado del widget,
-  // como los controladores para los campos de texto o el estado de un checkbox.
+  // Declaración de variables que mantendrán el estado del widget.
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _rememberMe = true;
 
+  // ✅ MÉTODO CORREGIDO: Ahora dentro del State, accede al 'context' de forma segura.
+  Future<void> _submitForm(String emailAddress, String password) async {
+    // Usamos 'mounted' para asegurarnos de que el widget sigue en el árbol antes de cualquier operación asíncrona.
+    if (!mounted) return;
+    
+    try {
+      // 1. Intenta iniciar sesión con Firebase
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailAddress.trim(), // Se añade trim() por seguridad
+        password: password,
+      );
+
+      // 2. Si el inicio de sesión es exitoso, navega a la ruta principal
+      if (mounted) {
+        context.go('/inicio'); // Navegación correcta con GoRouter
+      }
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+
+      String content;
+      if (e.code == 'user-not-found') {
+        content = 'No existe una cuenta registrada con ese correo electrónico.';
+      } else if (e.code == 'wrong-password') {
+        content = 'La clave que estás ingresando no es correcta.';
+      } else {
+        content = 'Ocurrió un error inesperado. Por favor, intenta de nuevo.';
+      }
+
+      // Mostrar el diálogo de error
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Error de Autenticación'),
+            content: Text(content),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
   @override
-  // El método build es el corazón de cualquier widget.
-  // Dibuja la interfaz de usuario en la pantalla y se llama cada vez que Flutter necesita renderizar el widget.
-  // En un StatefulWidget, se llama cuando se invoca a setState().
   Widget build(BuildContext context) {
     // Scaffold es como un andamio para construir una pantalla de Material Design.
     return Scaffold(
       // Define el color de fondo de toda la pantalla.
       backgroundColor: Colors.white,
-      // SafeArea es un widget crucial que ajusta su contenido para evitar que se superponga
-      // con elementos del sistema operativo.
+      // SafeArea es un widget crucial que ajusta su contenido.
       body: SafeArea(
         // SingleChildScrollView permite que su contenido sea desplazable.
         child: SingleChildScrollView(
@@ -128,66 +94,48 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(
-                      // Define el ancho y alto deseado para tu logo.
                       width: 200, // Ejemplo de ancho
                       child: Image.network(
-                        // ¡TODO: Reemplaza esta URL de ejemplo con la URL real de tu logo!
                         'https://res.cloudinary.com/dfznn7pui/image/upload/v1761514333/LOGO-HOSTAL_yvkmmi.png',
-                        fit: BoxFit
-                            .contain, // Ajusta cómo se muestra la imagen dentro del SizedBox
-                        loadingBuilder:
-                            (
-                              BuildContext context,
-                              Widget child,
-                              ImageChunkEvent? loadingProgress,
-                            ) {
-                              if (loadingProgress == null) return child;
-                              return Center(
-                                child: CircularProgressIndicator(
-                                  value:
-                                      loadingProgress.expectedTotalBytes != null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                            loadingProgress.expectedTotalBytes!
-                                      : null,
-                                ),
-                              );
-                            },
-                        errorBuilder:
-                            (
-                              BuildContext context,
-                              Object exception,
-                              StackTrace? stackTrace,
-                            ) {
-                              // Widget a mostrar si la imagen no se puede cargar (por ejemplo, un ícono o texto de error)
-                              return const Icon(Icons.error, color: Colors.red);
-                            },
+                        fit: BoxFit.contain,
+                        loadingBuilder: (BuildContext context, Widget child,
+                            ImageChunkEvent? loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
+                        },
+                        errorBuilder: (BuildContext context, Object exception,
+                            StackTrace? stackTrace) {
+                          // Widget a mostrar si la imagen no se puede cargar
+                          return const Icon(Icons.error, color: Colors.red);
+                        },
                       ),
                     ),
                   ],
                 ),
 
                 // Icono usuario.
-                Padding(
-                  padding: const EdgeInsets.only(top: 30.0, bottom: 0.0),
-                  child: const CircleAvatar(
-                    // 💡 CAMBIO 1: Ajusta el radio para el tamaño del círculo
+                const Padding(
+                  padding: EdgeInsets.only(top: 30.0, bottom: 0.0),
+                  child: CircleAvatar(
                     radius: 50, // Un poco más pequeño para que haya más "aire"
-                    // 💡 CAMBIO 2: Usa el color con opacidad que parece en la imagen
-                    backgroundColor: Color(
-                      0x1A2CB7A6,
-                    ), // Este es el verde claro
+                    backgroundColor: Color(0x1A2CB7A6), // Este es el verde claro
                     child: Icon(
                       Icons.person,
-                      // 💡 CAMBIO 3: Ajusta el tamaño del ícono
                       size: 60, // Más pequeño para que no toque los bordes
-                      // 💡 CAMBIO 4: El color del ícono es el verde principal
                       color: Color(0XFF2CB7A6),
                     ),
                   ),
                 ),
                 const SizedBox(height: 20.0),
 
-                // Campo de texto para el nombre de usuario (Username).
+                // ✅ CAMPO DE TEXTO PARA EL CORREO/USUARIO
                 TextFormField(
                   controller: _usernameController, // Asocia el controlador.
                   style: GoogleFonts.poppins(
@@ -228,7 +176,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 24.0),
 
-                // Campo de texto para la contraseña (Password).
+                // ✅ CAMPO DE TEXTO PARA LA CONTRASEÑA
                 TextFormField(
                   controller: _passwordController, // Asocia el controlador.
                   obscureText: true, // Oculta el texto.
@@ -285,10 +233,10 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   onPressed: () {
-                    widget._submitForm(
+                    // ⭐ CORRECCIÓN CLAVE: Llama al método del State sin pasar el context
+                    _submitForm(
                       _usernameController.text,
                       _passwordController.text,
-                      context,
                     );
                   },
                   child: const Text('INGRESAR'),
@@ -302,11 +250,8 @@ class _LoginPageState extends State<LoginPage> {
                     Row(
                       children: [
                         Checkbox(
-                          value:
-                              _rememberMe, // El valor se basa en la variable de estado.
+                          value: _rememberMe,
                           onChanged: (value) {
-                            // setState() notifica a Flutter que el estado ha cambiado,
-                            // por lo que debe volver a dibujar el widget.
                             setState(() {
                               _rememberMe = value ?? false;
                             });
@@ -362,12 +307,8 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const PantallaRegistro(),
-                          ),
-                        );
+                        // Navegación con GoRouter para el registro
+                        context.push('/registro');
                       },
                       child: const Text('CREAR CUENTA'),
                     ),
@@ -383,7 +324,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   // Es una buena práctica liberar los controladores cuando el widget se destruye
-  // para evitar fugas de memoria.
   @override
   void dispose() {
     _usernameController.dispose();
