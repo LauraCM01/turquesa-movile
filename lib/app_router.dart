@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:myapp/chat_list/chat_list_screen.dart';
-import 'chat_screen.dart';
+import 'Pantalla-Conversacion.dart';
 import 'Pantalla-Perfil.dart'; // Asegúrate de que este archivo existe
 import 'Pantalla-Inicio.dart'; // Asegúrate de que este archivo existe
 

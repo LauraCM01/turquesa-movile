@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:myapp/chat_message.dart';
-import 'package:myapp/message_buble.dart';
+import 'package:myapp/chat_list/chat_message.dart';
+import 'package:myapp/chat_list/message_buble.dart';
 
 class ChatScreen extends StatefulWidget {
   final String chatId;
