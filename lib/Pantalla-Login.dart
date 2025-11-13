@@ -7,9 +7,6 @@ import 'package:go_router/go_router.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
-  // *** El método _submitForm ha sido ELIMINADO de aquí (LoginPage) ***
-  // *** y MOVIDO a la clase _LoginPageState para usar el contexto (context) correctamente. ***
-
   @override
   // El método createState es obligatorio en un StatefulWidget y devuelve una instancia de su clase de estado asociada.
   State<LoginPage> createState() => _LoginPageState();
@@ -22,21 +19,17 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _rememberMe = true;
 
-  // ✅ MÉTODO CORREGIDO: Ahora dentro del State, accede al 'context' de forma segura.
   Future<void> _submitForm(String emailAddress, String password) async {
-    // Usamos 'mounted' para asegurarnos de que el widget sigue en el árbol antes de cualquier operación asíncrona.
     if (!mounted) return;
     
     try {
-      // 1. Intenta iniciar sesión con Firebase
       await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailAddress.trim(), // Se añade trim() por seguridad
+        email: emailAddress.trim(),
         password: password,
       );
 
-      // 2. Si el inicio de sesión es exitoso, navega a la ruta principal
       if (mounted) {
-        context.go('/inicio'); // Navegación correcta con GoRouter
+        context.go('/inicio');
       }
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
@@ -50,17 +43,36 @@ class _LoginPageState extends State<LoginPage> {
         content = 'Ocurrió un error inesperado. Por favor, intenta de nuevo.';
       }
 
-      // Mostrar el diálogo de error
+      // Mostrar el diálogo de error personalizado
       showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
-            title: const Text('Error de Autenticación'),
-            content: Text(content),
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.0),
+            ),
+            title: Text(
+              'Error de Autenticación',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold,
+                color: const Color(0XFF2CB7A6),
+              ),
+            ),
+            content: Text(
+              content,
+              style: GoogleFonts.poppins(),
+            ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
+                child: Text(
+                  'OK',
+                  style: GoogleFonts.poppins(
+                    color: const Color(0XFF2CB7A6),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           );
@@ -71,30 +83,23 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Scaffold es como un andamio para construir una pantalla de Material Design.
     return Scaffold(
-      // Define el color de fondo de toda la pantalla.
       backgroundColor: Colors.white,
-      // SafeArea es un widget crucial que ajusta su contenido.
       body: SafeArea(
-        // SingleChildScrollView permite que su contenido sea desplazable.
         child: SingleChildScrollView(
-          // Padding añade un espacio vacío alrededor de su widget hijo.
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            // Column organiza a sus hijos en una lista vertical.
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
                 const SizedBox(height: 60.0),
 
-                // Logo de la marca.
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     SizedBox(
-                      width: 200, // Ejemplo de ancho
+                      width: 200,
                       child: Image.network(
                         'https://res.cloudinary.com/dfznn7pui/image/upload/v1761514333/LOGO-HOSTAL_yvkmmi.png',
                         fit: BoxFit.contain,
@@ -112,7 +117,6 @@ class _LoginPageState extends State<LoginPage> {
                         },
                         errorBuilder: (BuildContext context, Object exception,
                             StackTrace? stackTrace) {
-                          // Widget a mostrar si la imagen no se puede cargar
                           return const Icon(Icons.error, color: Colors.red);
                         },
                       ),
@@ -120,24 +124,22 @@ class _LoginPageState extends State<LoginPage> {
                   ],
                 ),
 
-                // Icono usuario.
                 const Padding(
                   padding: EdgeInsets.only(top: 30.0, bottom: 0.0),
                   child: CircleAvatar(
-                    radius: 50, // Un poco más pequeño para que haya más "aire"
-                    backgroundColor: Color(0x1A2CB7A6), // Este es el verde claro
+                    radius: 50,
+                    backgroundColor: Color(0x1A2CB7A6),
                     child: Icon(
                       Icons.person,
-                      size: 60, // Más pequeño para que no toque los bordes
+                      size: 60,
                       color: Color(0XFF2CB7A6),
                     ),
                   ),
                 ),
                 const SizedBox(height: 20.0),
 
-                // ✅ CAMPO DE TEXTO PARA EL CORREO/USUARIO
                 TextFormField(
-                  controller: _usernameController, // Asocia el controlador.
+                  controller: _usernameController,
                   style: GoogleFonts.poppins(
                     fontSize: 16.0,
                     color: Colors.grey,
@@ -176,10 +178,9 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 24.0),
 
-                // ✅ CAMPO DE TEXTO PARA LA CONTRASEÑA
                 TextFormField(
-                  controller: _passwordController, // Asocia el controlador.
-                  obscureText: true, // Oculta el texto.
+                  controller: _passwordController,
+                  obscureText: true,
                   style: GoogleFonts.poppins(
                     fontSize: 16.0,
                     color: Colors.grey,
@@ -218,7 +219,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 24.0),
 
-                // Botón de inicio de sesión (Login Button).
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0XFF2CB7A6),
@@ -233,7 +233,6 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   onPressed: () {
-                    // ⭐ CORRECCIÓN CLAVE: Llama al método del State sin pasar el context
                     _submitForm(
                       _usernameController.text,
                       _passwordController.text,
@@ -243,7 +242,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 16.0),
 
-                // Fila para las opciones de "Recordar" y "Recuperar contraseña".
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -279,7 +277,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 24.0),
 
-                // Sección para crear una nueva cuenta.
                 Column(
                   children: [
                     Text(
@@ -307,7 +304,6 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       onPressed: () {
-                        // Navegación con GoRouter para el registro
                         context.push('/registro');
                       },
                       child: const Text('CREAR CUENTA'),
@@ -323,7 +319,6 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  // Es una buena práctica liberar los controladores cuando el widget se destruye
   @override
   void dispose() {
     _usernameController.dispose();

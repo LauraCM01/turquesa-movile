@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
@@ -21,6 +22,8 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
   final db = FirebaseFirestore.instance;
 
   bool _isLoading = false;
+  // Estado para controlar si la contraseña está oculta o no
+  bool _isPasswordObscured = true;
 
   @override
   void dispose() {
@@ -32,33 +35,41 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
     super.dispose();
   }
 
-  // ✅ FUNCIÓN AUXILIAR PARA MOSTRAR SNACKBAR CON ESTILO
-  void _showStyledSnackBar(String message, {bool isSuccess = false}) {
+  // Se eliminó la función _showStyledSnackBar ya que el código anterior
+  // usaba _showErrorDialog, y la nueva versión usará esa.
+  void _showErrorDialog(String message) {
     if (!mounted) return;
 
-    final Color primaryColor = Color(0XFF2CB7A6);
-    final Color backgroundColor = isSuccess
-        ? Colors.grey.shade200
-        : Colors.red.shade100;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        // Fondo gris claro
-        backgroundColor: backgroundColor,
-        duration: const Duration(seconds: 3),
-        content: Text(
-          message,
-          style: GoogleFonts.poppins(
-            // Texto turquesa
-            color: isSuccess ? primaryColor : Colors.red.shade700,
-            fontWeight: FontWeight.w600,
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
           ),
-        ),
-        // Puedes darle esquinas redondeadas si deseas
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        margin: const EdgeInsets.all(10),
-      ),
+          title: Text(
+            'Error de Registro',
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
+              color: const Color(0XFF2CB7A6),
+            ),
+          ),
+          content: Text(message, style: GoogleFonts.poppins()),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'OK',
+                style: GoogleFonts.poppins(
+                  color: const Color(0XFF2CB7A6),
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -75,11 +86,6 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
           );
 
       await guardarDatosFormulario(credential);
-
-      if (mounted) {
-        // ✅ USANDO LA FUNCIÓN DE ESTILO PARA ÉXITO
-        _showStyledSnackBar('Registro exitoso', isSuccess: true);
-      }
     } on FirebaseAuthException catch (e) {
       String mensaje = 'Error desconocido';
       if (e.code == 'weak-password') {
@@ -90,15 +96,15 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
         mensaje = 'El correo no es válido.';
       }
 
-      // ✅ USANDO LA FUNCIÓN DE ESTILO PARA ERROR
       if (mounted) {
-        _showStyledSnackBar(mensaje, isSuccess: false);
+        _showErrorDialog(mensaje);
       }
     } catch (e) {
       print(e);
       if (mounted) {
-        // ✅ USANDO LA FUNCIÓN DE ESTILO PARA ERROR GENERAL
-        _showStyledSnackBar('Error: $e', isSuccess: false);
+        _showErrorDialog(
+          'Ocurrió un error inesperado. Por favor, intenta de nuevo.',
+        );
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);
@@ -108,7 +114,7 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
   Future<void> guardarDatosFormulario(UserCredential credential) async {
     final user = credential.user;
     if (user == null) {
-      print("Error: El usuario es nulo después del registro.");
+      _showErrorDialog("Error: El usuario es nulo después del registro.");
       return;
     }
 
@@ -125,17 +131,12 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
       print('Usuario guardado en Firestore con UID: ${user.uid}');
 
       if (mounted) {
-        // Navegación con GoRouter a la ruta de inicio
         context.go('/inicio');
       }
     } catch (e) {
       print('Error al guardar en Firestore: $e');
       if (mounted) {
-        // ✅ USANDO LA FUNCIÓN DE ESTILO PARA ERROR DE FIRESTORE
-        _showStyledSnackBar(
-          'Error al guardar datos en Firestore',
-          isSuccess: false,
-        );
+        _showErrorDialog('Error al guardar los datos en la base de datos.');
       }
     }
   }
@@ -209,6 +210,7 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
                     hintText: 'Cédula',
                     keyboardType: TextInputType.number,
                     textInputAction: TextInputAction.next,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   ),
                   const SizedBox(height: 20),
                   _buildTextFormField(
@@ -221,7 +223,6 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
                   _buildTextFormField(
                     controller: _contrasenaController,
                     hintText: 'Contraseña',
-                    obscureText: true,
                     textInputAction: TextInputAction.done,
                   ),
                   const SizedBox(height: 40),
@@ -283,15 +284,19 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
   Widget _buildTextFormField({
     required TextEditingController controller,
     required String hintText,
-    bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
     TextInputAction textInputAction = TextInputAction.next,
+    List<TextInputFormatter>? inputFormatters,
   }) {
+    final isPasswordField = hintText == 'Contraseña';
+
     return TextFormField(
       controller: controller,
-      obscureText: obscureText,
+      // Usar _isPasswordObscured para la propiedad obscureText
+      obscureText: isPasswordField ? _isPasswordObscured : false,
       keyboardType: keyboardType,
       textInputAction: textInputAction,
+      inputFormatters: inputFormatters,
       validator: (value) {
         if (value == null || value.isEmpty) {
           return 'Este campo es obligatorio';
@@ -300,7 +305,7 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
             !RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
           return 'Por favor, introduce un correo válido';
         }
-        if (hintText == 'Contraseña' && value.length < 6) {
+        if (isPasswordField && value.length < 6) {
           return 'La contraseña debe tener al menos 6 caracteres';
         }
         return null;
