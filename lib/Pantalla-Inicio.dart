@@ -28,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _fetchRooms() async {
     const url =
-        'https://hostalsanrosa-production.up.railway.app/api/habitaciones/';
+        'https://hostalsanrosa-production.up.railway.app/api/habitaciones/todas';
     try {
       final response = await http.get(Uri.parse(url));
 
@@ -42,10 +42,11 @@ class _HomeScreenState extends State<HomeScreen> {
           _isLoading = false;
         });
       } else {
-        throw Exception('Error al cargar habitaciones');
+        var codigo = response.statusCode;
+        throw Exception('Error al cargar habitaciones $codigo');
       }
     } catch (e) {
-      debugPrint('Error al cargar habitaciones: $e');
+      debugPrint('Error al cargar habitaciones : $e');
       setState(() {
         _isLoading = false;
         _hasError = true;
@@ -85,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
             : _hasError
             ? const Center(
                 child: Text(
-                  'Error al cargar habitaciones',
+                  'Error al cargar habitaciones wwsws',
                   style: TextStyle(color: Colors.red),
                 ),
               )

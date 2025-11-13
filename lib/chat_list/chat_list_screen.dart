@@ -25,28 +25,30 @@ class _ChatListScreenState extends State<ChatListScreen> {
     _chats = [
       Chat(
         id: uuid.v4(),
-        avatarUrl: 'https://picsum.photos/id/1005/200/200',
-        name: 'Novio',
-        lastMessage: 'Esta tendencia moderna se ve bien y...',
-        time: '11.23 am',
-        unreadCount: 3,
-      ),
-      Chat(
-        id: uuid.v4(),
         avatarUrl: 'smiley_face',
-        name: 'Jose hermano',
-        lastMessage: 'No has entendido el punto',
-        time: '11.23 am',
-        unreadCount: 12,
+        name: 'Viviana García',
+        lastMessage: 'La habitación doble necesita...',
+        time: '12:25 pm',
+        unreadCount: 3,
         isIcon: true,
       ),
       Chat(
         id: uuid.v4(),
-        avatarUrl: 'https://picsum.photos/id/1011/200/200',
-        name: 'Justin Bergson',
-        lastMessage: 'Añadir ese poquito de realismo 3D...',
-        time: '10.19.2020',
+        avatarUrl: 'smiley_face',
+        name: 'Raúl Martínez',
+        lastMessage: 'Ya está limpia la habitación suite...',
+        time: '11:23 am',
         unreadCount: 1,
+        isIcon: true,
+      ),
+      Chat(
+        id: uuid.v4(),
+        avatarUrl: 'smiley_face',
+        name: 'Juan Pérez',
+        lastMessage: 'No está en funcionamiento la habitación...',
+        time: '10:20 am',
+        unreadCount: 1,
+        isIcon: true,
       ),
     ];
 
@@ -95,6 +97,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: 'Buscar chat...',
+                hintStyle: GoogleFonts.poppins(color: Colors.grey),
                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30.0),

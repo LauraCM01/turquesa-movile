@@ -22,7 +22,7 @@ class ChatListItem extends StatelessWidget {
             backgroundColor: chat.isIcon ? const Color(0xFF2CB7A6).withOpacity(0.1) : Colors.grey.shade200,
             backgroundImage: chat.isIcon ? null : NetworkImage(chat.avatarUrl),
             child: chat.isIcon 
-                ? Icon(Icons.person, color: chat.avatarUrl == 'smiley_face' ? Colors.orange : const Color(0xFF2CB7A6))
+                ? Icon(Icons.person, color: chat.avatarUrl == 'smiley_face' ? const Color(0xFF2CB7A6) : const Color(0xFF2CB7A6))
                 : null,
           ),
           const SizedBox(width: 12),
@@ -37,6 +37,7 @@ class ChatListItem extends StatelessWidget {
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
+                    color: Colors.grey,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
